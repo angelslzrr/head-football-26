@@ -1,0 +1,354 @@
+[gd_scene format=3 uid="uid://cpojvktw5f1f6"]
+
+[ext_resource type="Script" uid="uid://cynw161r7qnnf" path="res://scripts/Cancha.cs" id="1_ilx2b"]
+[ext_resource type="Script" uid="uid://40i6dcq2ekpf" path="res://scripts/Pelota.cs" id="1_yokxi"]
+[ext_resource type="Texture2D" uid="uid://cu5h6rwxqiefi" path="res://img/fondo_cancha.png" id="2_dvrj7"]
+[ext_resource type="Texture2D" uid="uid://doip45b3rhyhu" path="res://img/trionda_pelota.png" id="2_yokxi"]
+[ext_resource type="AudioStream" uid="uid://bkur7iahd0bcv" path="res://audios/audioRebotePelota.wav" id="3_5c533"]
+[ext_resource type="PackedScene" uid="uid://bua3xwr2qd0h6" path="res://escenas/futbolista.tscn" id="4_uocfg"]
+[ext_resource type="Texture2D" uid="uid://b2nboifcgu1gq" path="res://img/cabezones/conmebol/cabezon_Messi_Arg.png" id="6_8xsb8"]
+[ext_resource type="Texture2D" uid="uid://cj3qy0b5qdqne" path="res://img/porterias/PorteriaIzquierda.png" id="6_uocfg"]
+[ext_resource type="Texture2D" uid="uid://cymxwi5dp1qi3" path="res://img/porterias/PorteriaDerecha.png" id="7_8omlu"]
+[ext_resource type="Texture2D" uid="uid://bk1lx8y7k23w" path="res://img/camisetas/conmebol/camiseta_Argentina.png" id="7_dvrj7"]
+[ext_resource type="Texture2D" uid="uid://deyliggv2jdoy" path="res://img/chimpunes/chimpun2.png" id="8_00amt"]
+[ext_resource type="Script" uid="uid://rwlvth0x2u7l" path="res://scripts/Hud.cs" id="8_8omlu"]
+[ext_resource type="FontFile" uid="uid://bh1bpfcka4ewu" path="res://fonts/Roboto-Black.ttf" id="10_ua78f"]
+[ext_resource type="Texture2D" uid="uid://capsjf5pwjcea" path="res://img/banderas/conmebol/bandera_Peru.png" id="11_rb1qc"]
+[ext_resource type="Texture2D" uid="uid://dooiiailkjclg" path="res://img/banderas/conmebol/bandera_Argentina.png" id="12_d5jh7"]
+[ext_resource type="Script" uid="uid://sfm7ipwvukye" path="res://scripts/FutbolistaIA.cs" id="13_0ue7f"]
+[ext_resource type="Texture2D" uid="uid://bki54b2lt718d" path="res://img/cabezones/conmebol/cabezon_Guerrero_Per.png" id="14_qihi3"]
+[ext_resource type="Texture2D" uid="uid://c78ktic0cglvb" path="res://img/camisetas/conmebol/camiseta_Peru.png" id="15_jwhsl"]
+[ext_resource type="Texture2D" uid="uid://5kgwiqjatn07" path="res://img/chimpunes/chimpun3.png" id="16_8xsb8"]
+[ext_resource type="Texture2D" uid="uid://27s7i45eu6a2" path="res://img/fondoMarcadorMundial2026.png" id="17_ql0c1"]
+[ext_resource type="FontFile" uid="uid://dciwfrrrus1tl" path="res://fonts/NotoSans-Black.ttf" id="19_00amt"]
+[ext_resource type="AudioStream" uid="uid://kk0mmh4p13lv" path="res://audios/audioSilbatoFinal.wav" id="22_7dje5"]
+[ext_resource type="AudioStream" uid="uid://dhmupwt6i7odm" path="res://audios/audioSilbatoInicial.wav" id="23_le4dt"]
+[ext_resource type="Texture2D" uid="uid://dlpdug2mnbe" path="res://img/botonPausa.png" id="23_ql0c1"]
+[ext_resource type="AudioStream" uid="uid://53kb4xfy7v8s" path="res://audios/audioGol.wav" id="24_0kpj1"]
+[ext_resource type="Texture2D" uid="uid://degk32ua4yarp" path="res://img/botonPausaPressed.png" id="24_05atv"]
+[ext_resource type="Texture2D" uid="uid://df0aqi8eupfk5" path="res://img/botonPausaHover.png" id="25_dmtqv"]
+[ext_resource type="AudioStream" uid="uid://o3lc1cpbe732" path="res://audios/audioMurmulloEstadio.wav" id="25_nh2k7"]
+[ext_resource type="PackedScene" uid="uid://cyp3lg461clb3" path="res://escenas/UI/MenuPausa.tscn" id="26_le4dt"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_uv558"]
+size = Vector2(1280, 35)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_1iti0"]
+size = Vector2(6, 720)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_i8e8a"]
+size = Vector2(6, 720)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_of7a7"]
+size = Vector2(1280, 59)
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_b4mcn"]
+friction = 0.5
+bounce = 0.55
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_qv6ok"]
+radius = 22.751373
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_yokxi"]
+size = Vector2(39, 245)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ilx2b"]
+size = Vector2(39.736572, 245)
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_uocfg"]
+bounce = 0.2
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_uocfg"]
+radius = 4.0
+height = 98.01997
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_8omlu"]
+bounce = 0.2
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_j4fve"]
+radius = 4.0
+height = 96.97119
+
+[sub_resource type="LabelSettings" id="LabelSettings_i5qf7"]
+font_size = 29
+
+[sub_resource type="LabelSettings" id="LabelSettings_un0at"]
+font_size = 45
+
+[sub_resource type="LabelSettings" id="LabelSettings_ua78f"]
+font_size = 45
+font_color = Color(0, 0, 0, 1)
+
+[node name="Cancha" type="Node2D" unique_id=1794694867 node_paths=PackedStringArray("Pelota", "Jugador1", "Rival")]
+script = ExtResource("1_ilx2b")
+Pelota = NodePath("Pelota")
+Jugador1 = NodePath("Futbolista")
+Rival = NodePath("Rival")
+
+[node name="fondoCancha" type="TextureRect" parent="." unique_id=1064063349]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_right = 1280.0
+offset_bottom = 720.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_dvrj7")
+expand_mode = 1
+
+[node name="Suelo" type="StaticBody2D" parent="." unique_id=943920732]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Suelo" unique_id=1369656626]
+position = Vector2(640, 702.5)
+shape = SubResource("RectangleShape2D_uv558")
+
+[node name="ParedIzquierda" type="StaticBody2D" parent="." unique_id=603739164]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ParedIzquierda" unique_id=1601562242]
+position = Vector2(3, 360)
+shape = SubResource("RectangleShape2D_1iti0")
+
+[node name="ParedDerecha" type="StaticBody2D" parent="." unique_id=2137600333]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ParedDerecha" unique_id=985369465]
+position = Vector2(1277, 360)
+shape = SubResource("RectangleShape2D_i8e8a")
+
+[node name="Techo" type="StaticBody2D" parent="." unique_id=1373245502]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Techo" unique_id=377470746]
+position = Vector2(640, 29.5)
+shape = SubResource("RectangleShape2D_of7a7")
+
+[node name="Pelota" type="RigidBody2D" parent="." unique_id=2069616515 groups=["pelota"]]
+position = Vector2(640, 300)
+mass = 0.7
+physics_material_override = SubResource("PhysicsMaterial_b4mcn")
+continuous_cd = 2
+contact_monitor = true
+max_contacts_reported = 2
+script = ExtResource("1_yokxi")
+metadata/_edit_group_ = true
+
+[node name="Sprite2D" type="Sprite2D" parent="Pelota" unique_id=1538063573]
+scale = Vector2(0.226, 0.226)
+texture = ExtResource("2_yokxi")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Pelota" unique_id=40359686]
+shape = SubResource("CircleShape2D_qv6ok")
+
+[node name="SonidoRebote" type="AudioStreamPlayer2D" parent="Pelota" unique_id=1086135032]
+stream = ExtResource("3_5c533")
+volume_db = -25.0
+
+[node name="Futbolista" parent="." unique_id=496234523 instance=ExtResource("4_uocfg")]
+position = Vector2(946, 631.9)
+scale = Vector2(1.8, 1.8)
+TexturaCabeza = ExtResource("6_8xsb8")
+TexturaCamiseta = ExtResource("7_dvrj7")
+TexturaChimpun = ExtResource("8_00amt")
+
+[node name="Rival" parent="." unique_id=195624899 instance=ExtResource("4_uocfg")]
+position = Vector2(334, 631.9)
+rotation = 3.1415927
+scale = Vector2(1.8, -1.8)
+script = ExtResource("13_0ue7f")
+DistanciaPatada = 60.0
+DistanciaSaltoX = 120.0
+UmbralSaltoY = 10.0
+ZonaMuertaX = 15.0
+LimiteAvanceSuelo = 1000.0
+NivelSueloPelota = 685.0
+AlturaAireMinima = 40.0
+ReaccionEquipoFuerte = 0.03
+ReaccionEquipoDebil = 0.35
+ErrorPrediccionEquipoFuerte = 0.0
+ErrorPrediccionEquipoDebil = 70.0
+ProbabilidadFalloEquipoFuerte = 0.02
+ProbabilidadFalloEquipoDebil = 0.35
+DireccionJugador = 1.0
+TexturaCabeza = ExtResource("14_qihi3")
+TexturaCamiseta = ExtResource("15_jwhsl")
+TexturaChimpun = ExtResource("16_8xsb8")
+
+[node name="PorteriaIzquierda" type="Area2D" parent="." unique_id=871135965]
+linear_damp_space_override = 1
+linear_damp = 5.0
+angular_damp_space_override = 1
+angular_damp = 5.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PorteriaIzquierda" unique_id=638586358]
+position = Vector2(19.5, 562.5)
+shape = SubResource("RectangleShape2D_yokxi")
+
+[node name="PorteriaDerecha" type="Area2D" parent="." unique_id=1223356449]
+position = Vector2(-1, 0)
+linear_damp_space_override = 1
+linear_damp = 5.0
+angular_damp_space_override = 1
+angular_damp = 5.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PorteriaDerecha" unique_id=1827381005]
+position = Vector2(1261.1317, 562.5)
+shape = SubResource("RectangleShape2D_ilx2b")
+
+[node name="MarcoIzquierdo" type="StaticBody2D" parent="." unique_id=422293910]
+physics_material_override = SubResource("PhysicsMaterial_uocfg")
+
+[node name="Sprite2D" type="Sprite2D" parent="MarcoIzquierdo" unique_id=23250583]
+position = Vector2(51.000004, 551)
+scale = Vector2(0.475, 0.474)
+texture = ExtResource("6_uocfg")
+
+[node name="ColisionLarguero" type="CollisionShape2D" parent="MarcoIzquierdo" unique_id=840143876]
+position = Vector2(49, 418)
+rotation = 1.5882496
+shape = SubResource("CapsuleShape2D_uocfg")
+
+[node name="MarcoDerecho" type="StaticBody2D" parent="." unique_id=1952493045]
+physics_material_override = SubResource("PhysicsMaterial_8omlu")
+
+[node name="Sprite2D" type="Sprite2D" parent="MarcoDerecho" unique_id=538845604]
+position = Vector2(1229, 551)
+scale = Vector2(0.475, 0.475)
+texture = ExtResource("7_8omlu")
+
+[node name="ColisionLarguero" type="CollisionShape2D" parent="MarcoDerecho" unique_id=1255603775]
+position = Vector2(1231, 418)
+rotation = 1.553343
+shape = SubResource("CapsuleShape2D_j4fve")
+
+[node name="HUD" type="CanvasLayer" parent="." unique_id=2027646222]
+script = ExtResource("8_8omlu")
+
+[node name="FondoMarcador" type="TextureRect" parent="HUD" unique_id=713954111]
+offset_left = -2.0
+offset_top = -6.0
+offset_right = 696.2759
+offset_bottom = 75.0
+texture = ExtResource("17_ql0c1")
+
+[node name="LabelTiempo" type="Label" parent="HUD/FondoMarcador" unique_id=368713716]
+modulate = Color(0, 0, 0, 1)
+layout_mode = 0
+offset_left = 28.0
+offset_top = 24.0
+offset_right = 122.0
+offset_bottom = 62.0
+theme_override_fonts/font = ExtResource("10_ua78f")
+theme_override_font_sizes/font_size = 29
+text = "0:00"
+label_settings = SubResource("LabelSettings_i5qf7")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="LabelGoles1" type="Label" parent="HUD/FondoMarcador" unique_id=1078967119]
+modulate = Color(0, 0, 0, 1)
+layout_mode = 0
+offset_left = 350.0
+offset_top = 15.0
+offset_right = 384.0
+offset_bottom = 68.0
+theme_override_fonts/font = ExtResource("10_ua78f")
+theme_override_font_sizes/font_size = 45
+text = "0"
+label_settings = SubResource("LabelSettings_un0at")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="LabelGoles2" type="Label" parent="HUD/FondoMarcador" unique_id=1033851288]
+layout_mode = 0
+offset_left = 450.0
+offset_top = 15.0
+offset_right = 484.0
+offset_bottom = 68.0
+theme_override_fonts/font = ExtResource("10_ua78f")
+theme_override_font_sizes/font_size = 45
+text = "0"
+label_settings = SubResource("LabelSettings_ua78f")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="NombreEquipo1" type="Label" parent="HUD/FondoMarcador" unique_id=1061197279]
+layout_mode = 0
+offset_left = 221.0
+offset_top = 11.0
+offset_right = 342.0
+offset_bottom = 66.0
+theme_override_fonts/font = ExtResource("19_00amt")
+theme_override_font_sizes/font_size = 40
+text = "PER"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="NombreEquipo2" type="Label" parent="HUD/FondoMarcador" unique_id=36955862]
+layout_mode = 0
+offset_left = 492.0
+offset_top = 11.0
+offset_right = 613.0
+offset_bottom = 66.0
+theme_override_fonts/font = ExtResource("19_00amt")
+theme_override_font_sizes/font_size = 40
+text = "ARG"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Bandera1" type="TextureRect" parent="HUD/FondoMarcador" unique_id=1256711072]
+layout_mode = 0
+offset_left = 169.0
+offset_top = 22.0
+offset_right = 221.3952
+offset_bottom = 57.0
+texture = ExtResource("11_rb1qc")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Bandera2" type="TextureRect" parent="HUD/FondoMarcador" unique_id=572943314]
+layout_mode = 0
+offset_left = 613.0
+offset_top = 22.0
+offset_right = 665.395
+offset_bottom = 57.0
+texture = ExtResource("12_d5jh7")
+expand_mode = 1
+
+[node name="TimerPartido" type="Timer" parent="HUD" unique_id=975613622]
+autostart = true
+
+[node name="SilbatoFinal" type="AudioStreamPlayer" parent="HUD" unique_id=77718223]
+stream = ExtResource("22_7dje5")
+volume_db = -7.0
+
+[node name="BtnPausa" type="TextureButton" parent="HUD" unique_id=1208215912]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -76.0
+offset_bottom = 83.0
+grow_horizontal = 0
+texture_normal = ExtResource("23_ql0c1")
+texture_pressed = ExtResource("24_05atv")
+texture_hover = ExtResource("25_dmtqv")
+stretch_mode = 4
+
+[node name="SilbatoInicio" type="AudioStreamPlayer" parent="." unique_id=1162719388]
+stream = ExtResource("23_le4dt")
+volume_db = -7.0
+
+[node name="GritoGol" type="AudioStreamPlayer" parent="." unique_id=1906463854]
+stream = ExtResource("24_0kpj1")
+volume_db = -7.0
+
+[node name="FondoEstadio" type="AudioStreamPlayer" parent="." unique_id=200141170]
+stream = ExtResource("25_nh2k7")
+volume_db = -20.0
+autoplay = true
+
+[node name="MenuPausa" parent="." unique_id=463072860 instance=ExtResource("26_le4dt")]
+visible = false
+
+[connection signal="body_entered" from="Pelota" to="Pelota" method="_OnBodyEntered"]
+[connection signal="body_entered" from="PorteriaIzquierda" to="." method="OnPorteriaIzquierdaBodyEntered"]
+[connection signal="body_entered" from="PorteriaDerecha" to="." method="OnPorteriaDerechaBodyEntered"]

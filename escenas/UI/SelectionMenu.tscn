@@ -1,0 +1,157 @@
+[gd_scene format=3 uid="uid://clp3ib8rydb46"]
+
+[ext_resource type="Script" uid="uid://m8v3xf6rwty" path="res://scripts/UI/SelectionMenuController.cs" id="1_couy6"]
+[ext_resource type="Texture2D" uid="uid://b4lnx0iconofd" path="res://img/Fondo_Menus.png" id="1_la8bv"]
+
+[node name="SelectionMenu" type="Control" unique_id=109301702]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_couy6")
+
+[node name="Fondo" type="TextureRect" parent="." unique_id=339872106]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+texture = ExtResource("1_la8bv")
+
+[node name="Layout" type="VBoxContainer" parent="." unique_id=192436379]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 10
+
+[node name="Titulo" type="Label" parent="Layout" unique_id=1950011831]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.87058824, 0.7294118, 0, 1)
+theme_override_font_sizes/font_size = 24
+text = "Selecciona tu equipo"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ContenidoPrincipal" type="HBoxContainer" parent="Layout" unique_id=650399217]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="PanelIzquierdo" type="VBoxContainer" parent="Layout/ContenidoPrincipal" unique_id=1132396505]
+custom_minimum_size = Vector2(180, 0)
+layout_mode = 2
+theme_override_constants/separation = 16
+alignment = 1
+
+[node name="BtnSudamerica" type="Button" parent="Layout/ContenidoPrincipal/PanelIzquierdo" unique_id=1088388956]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+text = "Sudamerica"
+
+[node name="BtnEuropa" type="Button" parent="Layout/ContenidoPrincipal/PanelIzquierdo" unique_id=124720303]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+text = "Europa"
+
+[node name="BtnNorteYCentro" type="Button" parent="Layout/ContenidoPrincipal/PanelIzquierdo" unique_id=1743491989]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+text = "Norte, Centroamérica y el Caribe"
+
+[node name="BtnAfrica" type="Button" parent="Layout/ContenidoPrincipal/PanelIzquierdo" unique_id=54279218]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+text = "Africa"
+
+[node name="BtnAsia" type="Button" parent="Layout/ContenidoPrincipal/PanelIzquierdo" unique_id=985992575]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+text = "Asia"
+
+[node name="BtnOceania" type="Button" parent="Layout/ContenidoPrincipal/PanelIzquierdo" unique_id=1567661122]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+text = "Oceania"
+
+[node name="PanelCentral" type="VBoxContainer" parent="Layout/ContenidoPrincipal" unique_id=284401430]
+layout_mode = 2
+size_flags_horizontal = 3
+alignment = 1
+
+[node name="Scroll" type="ScrollContainer" parent="Layout/ContenidoPrincipal/PanelCentral" unique_id=1382826058]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="GridEquipos" type="GridContainer" parent="Layout/ContenidoPrincipal/PanelCentral/Scroll" unique_id=1180440724]
+layout_mode = 2
+size_flags_horizontal = 6
+size_flags_vertical = 6
+theme_override_constants/h_separation = 12
+theme_override_constants/v_separation = 12
+columns = 2
+
+[node name="MensajeVacio" type="Label" parent="Layout/ContenidoPrincipal/PanelCentral" unique_id=1242216813]
+layout_mode = 2
+text = "Aún no cargamos datos para esta confederacion..."
+horizontal_alignment = 1
+
+[node name="PanelDerecho" type="PanelContainer" parent="Layout/ContenidoPrincipal" unique_id=947430288]
+custom_minimum_size = Vector2(280, 0)
+layout_mode = 2
+
+[node name="MapaRegionFondo" type="TextureRect" parent="Layout/ContenidoPrincipal/PanelDerecho" unique_id=1744384477]
+modulate = Color(1, 1, 1, 0.2)
+layout_mode = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="ContenidoDerecho" type="VBoxContainer" parent="Layout/ContenidoPrincipal/PanelDerecho" unique_id=631954265]
+layout_mode = 2
+theme_override_constants/separation = 16
+alignment = 1
+
+[node name="PreviewBandera" type="TextureRect" parent="Layout/ContenidoPrincipal/PanelDerecho/ContenidoDerecho" unique_id=1420287833]
+custom_minimum_size = Vector2(0, 120)
+layout_mode = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="PreviewNombre" type="Label" parent="Layout/ContenidoPrincipal/PanelDerecho/ContenidoDerecho" unique_id=1275042297]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+horizontal_alignment = 1
+
+[node name="PreviewEstrellas" type="HBoxContainer" parent="Layout/ContenidoPrincipal/PanelDerecho/ContenidoDerecho" unique_id=1113819655]
+layout_mode = 2
+theme_override_constants/separation = 4
+alignment = 1
+
+[node name="ComposicionSprite" type="Control" parent="Layout/ContenidoPrincipal/PanelDerecho/ContenidoDerecho" unique_id=1753763525]
+custom_minimum_size = Vector2(160, 180)
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="PreviewCamiseta" type="TextureRect" parent="Layout/ContenidoPrincipal/PanelDerecho/ContenidoDerecho/ComposicionSprite" unique_id=123837145]
+layout_mode = 0
+offset_left = 30.0
+offset_top = 85.0
+offset_right = 130.0
+offset_bottom = 165.0
+expand_mode = 1
+
+[node name="PreviewCabeza" type="TextureRect" parent="Layout/ContenidoPrincipal/PanelDerecho/ContenidoDerecho/ComposicionSprite" unique_id=1718429934]
+layout_mode = 0
+offset_left = 20.0
+offset_right = 140.0
+offset_bottom = 120.0
+expand_mode = 1
+
+[node name="PanelInferior" type="CenterContainer" parent="Layout" unique_id=514804981]
+layout_mode = 2
+
+[node name="BtnComenzar" type="Button" parent="Layout/PanelInferior" unique_id=233238570]
+custom_minimum_size = Vector2(240, 50)
+layout_mode = 2
+text = "Comenzar eliminatoria"

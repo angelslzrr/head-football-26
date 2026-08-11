@@ -1,0 +1,216 @@
+[gd_scene format=3 uid="uid://b2bt7xe1tynnu"]
+
+[ext_resource type="Texture2D" uid="uid://b4lnx0iconofd" path="res://img/Fondo_Menus.png" id="1_bidsq"]
+[ext_resource type="Script" uid="uid://b7gykdxv3wbgm" path="res://scripts/UI/TournamentHubController.cs" id="1_k84u8"]
+
+[node name="TournamentHub" type="Control" unique_id=894271078]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_k84u8")
+
+[node name="Fondo" type="TextureRect" parent="." unique_id=1153999712]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("1_bidsq")
+
+[node name="Layout" type="VBoxContainer" parent="." unique_id=77293600]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Titulo" type="Label" parent="Layout" unique_id=1917140464]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.87058824, 0.7294118, 0, 1)
+theme_override_font_sizes/font_size = 24
+text = "Eliminatorias"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Pestanas" type="TabContainer" parent="Layout" unique_id=236791141]
+layout_mode = 2
+size_flags_vertical = 3
+current_tab = 0
+
+[node name="Posiciones" type="VBoxContainer" parent="Layout/Pestanas" unique_id=121486794]
+layout_mode = 2
+metadata/_tab_index = 0
+
+[node name="ContenedorPosiciones" type="HBoxContainer" parent="Layout/Pestanas/Posiciones" unique_id=183508865]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 15
+alignment = 1
+
+[node name="PanelDetallesEquipo" type="PanelContainer" parent="Layout/Pestanas/Posiciones/ContenedorPosiciones" unique_id=1062372941]
+custom_minimum_size = Vector2(280, 0)
+layout_mode = 2
+
+[node name="MapaRegionFondo" type="TextureRect" parent="Layout/Pestanas/Posiciones/ContenedorPosiciones/PanelDetallesEquipo" unique_id=1833262751]
+modulate = Color(1, 1, 1, 0.2)
+layout_mode = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="ContenidoDetalles" type="VBoxContainer" parent="Layout/Pestanas/Posiciones/ContenedorPosiciones/PanelDetallesEquipo" unique_id=1751431843]
+layout_mode = 2
+theme_override_constants/separation = 16
+alignment = 1
+
+[node name="PreviewBandera" type="TextureRect" parent="Layout/Pestanas/Posiciones/ContenedorPosiciones/PanelDetallesEquipo/ContenidoDetalles" unique_id=145786456]
+custom_minimum_size = Vector2(0, 120)
+layout_mode = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="PreviewNombre" type="Label" parent="Layout/Pestanas/Posiciones/ContenedorPosiciones/PanelDetallesEquipo/ContenidoDetalles" unique_id=1222266947]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+horizontal_alignment = 1
+
+[node name="PreviewEstrellas" type="HBoxContainer" parent="Layout/Pestanas/Posiciones/ContenedorPosiciones/PanelDetallesEquipo/ContenidoDetalles" unique_id=1460024798]
+layout_mode = 2
+theme_override_constants/separation = 4
+alignment = 1
+
+[node name="ComposicionSprite" type="Control" parent="Layout/Pestanas/Posiciones/ContenedorPosiciones/PanelDetallesEquipo/ContenidoDetalles" unique_id=391457558]
+custom_minimum_size = Vector2(160, 180)
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="PreviewCamiseta" type="TextureRect" parent="Layout/Pestanas/Posiciones/ContenedorPosiciones/PanelDetallesEquipo/ContenidoDetalles/ComposicionSprite" unique_id=658766138]
+layout_mode = 0
+offset_left = 30.0
+offset_top = 85.0
+offset_right = 130.0
+offset_bottom = 165.0
+expand_mode = 1
+flip_h = true
+
+[node name="PreviewCabeza" type="TextureRect" parent="Layout/Pestanas/Posiciones/ContenedorPosiciones/PanelDetallesEquipo/ContenidoDetalles/ComposicionSprite" unique_id=1789557110]
+layout_mode = 0
+offset_left = 20.0
+offset_right = 140.0
+offset_bottom = 120.0
+expand_mode = 1
+flip_h = true
+
+[node name="FondoTabla" type="PanelContainer" parent="Layout/Pestanas/Posiciones/ContenedorPosiciones" unique_id=371108548]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="ScrollPosiciones" type="ScrollContainer" parent="Layout/Pestanas/Posiciones/ContenedorPosiciones/FondoTabla" unique_id=415499077]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="GridPosiciones" type="GridContainer" parent="Layout/Pestanas/Posiciones/ContenedorPosiciones/FondoTabla/ScrollPosiciones" unique_id=1190638233]
+layout_mode = 2
+size_flags_horizontal = 6
+size_flags_vertical = 6
+theme_override_constants/h_separation = 2
+theme_override_constants/v_separation = 2
+columns = 8
+
+[node name="Fixture" type="VBoxContainer" parent="Layout/Pestanas" unique_id=731072571]
+visible = false
+layout_mode = 2
+metadata/_tab_index = 1
+
+[node name="ContenedorFixture" type="HBoxContainer" parent="Layout/Pestanas/Fixture" unique_id=911073968]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 15
+alignment = 1
+
+[node name="FondoFixture" type="PanelContainer" parent="Layout/Pestanas/Fixture/ContenedorFixture" unique_id=1198768515]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="ScrollFixture" type="ScrollContainer" parent="Layout/Pestanas/Fixture/ContenedorFixture/FondoFixture" unique_id=842778091]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ListaFixture" type="VBoxContainer" parent="Layout/Pestanas/Fixture/ContenedorFixture/FondoFixture/ScrollFixture" unique_id=1754258229]
+layout_mode = 2
+size_flags_horizontal = 6
+size_flags_vertical = 6
+theme_override_constants/separation = 2
+alignment = 1
+
+[node name="PanelPrevia" type="PanelContainer" parent="Layout/Pestanas/Fixture/ContenedorFixture" unique_id=1823097496]
+custom_minimum_size = Vector2(360, 0)
+layout_mode = 2
+
+[node name="ContenidoPrevia" type="VBoxContainer" parent="Layout/Pestanas/Fixture/ContenedorFixture/PanelPrevia" unique_id=1552092300]
+layout_mode = 2
+theme_override_constants/separation = 20
+alignment = 1
+
+[node name="TituloPrevia" type="Label" parent="Layout/Pestanas/Fixture/ContenedorFixture/PanelPrevia/ContenidoPrevia" unique_id=1769147033]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.87058824, 0.7294118, 0, 1)
+theme_override_font_sizes/font_size = 22
+text = "TU PRÓXIMO PARTIDO"
+horizontal_alignment = 1
+
+[node name="DueloCabezones" type="HBoxContainer" parent="Layout/Pestanas/Fixture/ContenedorFixture/PanelPrevia/ContenidoPrevia" unique_id=958529158]
+layout_mode = 2
+theme_override_constants/separation = 20
+alignment = 1
+
+[node name="CabezaLocal" type="TextureRect" parent="Layout/Pestanas/Fixture/ContenedorFixture/PanelPrevia/ContenidoPrevia/DueloCabezones" unique_id=1635014102]
+custom_minimum_size = Vector2(110, 110)
+layout_mode = 2
+expand_mode = 1
+stretch_mode = 5
+flip_h = true
+
+[node name="LabelVS" type="Label" parent="Layout/Pestanas/Fixture/ContenedorFixture/PanelPrevia/ContenidoPrevia/DueloCabezones" unique_id=212568746]
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "VS"
+
+[node name="CabezaVisitante" type="TextureRect" parent="Layout/Pestanas/Fixture/ContenedorFixture/PanelPrevia/ContenidoPrevia/DueloCabezones" unique_id=90048427]
+custom_minimum_size = Vector2(110, 110)
+layout_mode = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="NombresPrevia" type="Label" parent="Layout/Pestanas/Fixture/ContenedorFixture/PanelPrevia/ContenidoPrevia" unique_id=711085251]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Local vs Visitante"
+horizontal_alignment = 1
+
+[node name="MensajePartidoJugador" type="Label" parent="Layout" unique_id=1447961432]
+custom_minimum_size = Vector2(0, 20)
+layout_mode = 2
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="BarraInferior" type="HBoxContainer" parent="Layout" unique_id=2098956195]
+layout_mode = 2
+theme_override_constants/separation = 20
+alignment = 1
+
+[node name="BtnVolver" type="Button" parent="Layout/BarraInferior" unique_id=346517407]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+text = "Volver al menú"
+
+[node name="BtnSimularJornada" type="Button" parent="Layout/BarraInferior" unique_id=193755199]
+custom_minimum_size = Vector2(200, 50)
+layout_mode = 2
+text = "Simular partido"

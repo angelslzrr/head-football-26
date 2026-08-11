@@ -1,0 +1,166 @@
+[gd_scene format=3 uid="uid://dl6ff3vlpw7vv"]
+
+[ext_resource type="Script" uid="uid://dpoyw4ckexwkm" path="res://scripts/UI/MainMenuController.cs" id="1_cv4ak"]
+[ext_resource type="Texture2D" uid="uid://b4lnx0iconofd" path="res://img/Fondo_Menus.png" id="2_kuirl"]
+[ext_resource type="Texture2D" uid="uid://djmgb68065ppv" path="res://img/logo_hf26.png" id="3_j347a"]
+[ext_resource type="Texture2D" uid="uid://ectukxjiro42" path="res://img/botonVolumen.png" id="4_6rekn"]
+[ext_resource type="Texture2D" uid="uid://clpvao88jy03p" path="res://img/botonVolumenPressed.png" id="5_p816x"]
+[ext_resource type="Texture2D" uid="uid://cqe5yn0eh0852" path="res://img/botonVolumenHover.png" id="6_ech3n"]
+
+[node name="MainMenu" type="Control" unique_id=1755545553]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_cv4ak")
+
+[node name="Fondo" type="TextureRect" parent="." unique_id=630366566]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_kuirl")
+
+[node name="LogoContainer" type="CenterContainer" parent="." unique_id=52813370]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -150.0
+offset_top = 33.0
+offset_right = 150.0
+offset_bottom = 333.0
+grow_horizontal = 2
+
+[node name="LogoPlaceholder" type="TextureRect" parent="LogoContainer" unique_id=2035711493]
+layout_mode = 2
+texture = ExtResource("3_j347a")
+
+[node name="PanelBotones" type="VBoxContainer" parent="." unique_id=1963247284]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -150.0
+offset_top = 7.0
+offset_right = 150.0
+offset_bottom = 207.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 25
+
+[node name="BtnPartidoRapido" type="Button" parent="PanelBotones" unique_id=182373865]
+custom_minimum_size = Vector2(300, 50)
+layout_mode = 2
+text = "Partido Rápido"
+
+[node name="BtnMundial2026" type="Button" parent="PanelBotones" unique_id=2005139487]
+custom_minimum_size = Vector2(300, 50)
+layout_mode = 2
+text = "Campeonato del Mundo 2026"
+
+[node name="BtnSalir" type="Button" parent="PanelBotones" unique_id=2078903827]
+custom_minimum_size = Vector2(300, 50)
+layout_mode = 2
+text = "Salir"
+
+[node name="OverlayPartidaEnCurso" type="Control" parent="." unique_id=1300722344]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Dim" type="ColorRect" parent="OverlayPartidaEnCurso" unique_id=1728648215]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.5019608)
+
+[node name="CentroTarjeta" type="CenterContainer" parent="OverlayPartidaEnCurso" unique_id=1057744814]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TarjetaPartida" type="PanelContainer" parent="OverlayPartidaEnCurso/CentroTarjeta" unique_id=1849645788]
+custom_minimum_size = Vector2(360, 0)
+layout_mode = 2
+
+[node name="ContenidoTarjeta" type="VBoxContainer" parent="OverlayPartidaEnCurso/CentroTarjeta/TarjetaPartida" unique_id=972302867]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="LabelTitulo" type="Label" parent="OverlayPartidaEnCurso/CentroTarjeta/TarjetaPartida/ContenidoTarjeta" unique_id=457092584]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.87058824, 0.7294118, 0, 1)
+theme_override_font_sizes/font_size = 22
+text = "Partida en curso"
+horizontal_alignment = 1
+
+[node name="LabelInfo" type="Label" parent="OverlayPartidaEnCurso/CentroTarjeta/TarjetaPartida/ContenidoTarjeta" unique_id=533032173]
+layout_mode = 2
+text = "(Info del país)"
+horizontal_alignment = 1
+
+[node name="Botones" type="HBoxContainer" parent="OverlayPartidaEnCurso/CentroTarjeta/TarjetaPartida/ContenidoTarjeta" unique_id=118330538]
+layout_mode = 2
+theme_override_constants/separation = 12
+alignment = 1
+
+[node name="BtnContinuar" type="Button" parent="OverlayPartidaEnCurso/CentroTarjeta/TarjetaPartida/ContenidoTarjeta/Botones" unique_id=2118567981]
+custom_minimum_size = Vector2(140, 44)
+layout_mode = 2
+text = "Continuar"
+
+[node name="BtnNuevoCampeonato" type="Button" parent="OverlayPartidaEnCurso/CentroTarjeta/TarjetaPartida/ContenidoTarjeta/Botones" unique_id=1474519187]
+custom_minimum_size = Vector2(160, 44)
+layout_mode = 2
+text = "Nuevo campeonato"
+
+[node name="BtnVolumenPopup" type="TextureButton" parent="." unique_id=958679061]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -82.0
+offset_top = 12.0
+offset_right = -12.0
+offset_bottom = 82.0
+grow_horizontal = 0
+texture_normal = ExtResource("4_6rekn")
+texture_pressed = ExtResource("5_p816x")
+texture_hover = ExtResource("6_ech3n")
+
+[node name="PanelVolumen" type="PanelContainer" parent="." unique_id=879549524]
+visible = false
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -63.0
+offset_top = 94.0
+offset_right = -28.0
+offset_bottom = 214.0
+grow_horizontal = 0
+
+[node name="SliderVolumen" type="VSlider" parent="PanelVolumen" unique_id=1405671087]
+custom_minimum_size = Vector2(35, 120)
+layout_mode = 2
+max_value = 1.0
+step = 0.01
+value = 0.5
+ticks_position = 3

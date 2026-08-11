@@ -1,0 +1,8 @@
+[gd_scene format=3 uid="uid://bha21w4jvjr1p"]
+
+[ext_resource type="AudioStream" uid="uid://cl58jvnfge6ma" path="res://audios/audioFondoMusical.wav" id="1_ibon0"]
+
+[node name="MusicaGlobal" type="AudioStreamPlayer" unique_id=308753713]
+stream = ExtResource("1_ibon0")
+volume_db = -15.0
+autoplay = true

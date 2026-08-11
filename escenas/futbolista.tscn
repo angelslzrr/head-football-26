@@ -1,0 +1,49 @@
+[gd_scene format=3 uid="uid://bua3xwr2qd0h6"]
+
+[ext_resource type="Script" uid="uid://bjbprb04ivvuu" path="res://scripts/Futbolista.cs" id="1_1l4oc"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_sesi1"]
+radius = 4.7461357
+height = 22.802277
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_75e3j"]
+radius = 25.0
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_sesi1"]
+size = Vector2(33, 27)
+
+[node name="Futbolista" type="CharacterBody2D" unique_id=496234523]
+scale = Vector2(2, 2)
+script = ExtResource("1_1l4oc")
+metadata/_edit_group_ = true
+
+[node name="CamisetaSprite" type="Sprite2D" parent="." unique_id=1636483114]
+position = Vector2(3, 16)
+scale = Vector2(0.118280195, 0.11828022)
+
+[node name="Chimpun" type="Area2D" parent="." unique_id=1188909489]
+position = Vector2(2.9999998, -2.2351742e-08)
+rotation = 0.08731983
+metadata/_edit_group_ = true
+
+[node name="ChimpunSprite" type="Sprite2D" parent="Chimpun" unique_id=1703657218]
+position = Vector2(3, 35)
+scale = Vector2(0.046517674, 0.04651767)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Chimpun" unique_id=1578506808]
+position = Vector2(3.6812172, 36.317333)
+rotation = 0.96296346
+scale = Vector2(0.99999994, 0.99999994)
+shape = SubResource("CapsuleShape2D_sesi1")
+
+[node name="CabezaSprite" type="Sprite2D" parent="." unique_id=765943773]
+position = Vector2(0, -10.500001)
+scale = Vector2(0.20995848, 0.20995851)
+
+[node name="ColisionCabeza" type="CollisionShape2D" parent="." unique_id=1641115406]
+position = Vector2(0.5, -10.5)
+shape = SubResource("CircleShape2D_75e3j")
+
+[node name="ColisionCamiseta" type="CollisionShape2D" parent="." unique_id=1947788585]
+position = Vector2(3.5, 16)
+shape = SubResource("RectangleShape2D_sesi1")

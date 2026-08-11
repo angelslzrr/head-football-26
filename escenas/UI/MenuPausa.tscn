@@ -1,0 +1,58 @@
+[gd_scene format=3 uid="uid://cyp3lg461clb3"]
+
+[ext_resource type="Script" uid="uid://c712dmoe7j1v4" path="res://scripts/UI/MenuPausaController.cs" id="1_608wo"]
+
+[node name="MenuPausa" type="CanvasLayer" unique_id=463072860]
+process_mode = 3
+script = ExtResource("1_608wo")
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=1760170489]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.6392157)
+
+[node name="PanelCentral" type="CenterContainer" parent="." unique_id=2009031136]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="CajaBotones" type="VBoxContainer" parent="PanelCentral" unique_id=399497006]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="TituloPausa" type="Label" parent="PanelCentral/CajaBotones" unique_id=240093366]
+layout_mode = 2
+theme_override_font_sizes/font_size = 36
+text = "JUEGO PAUSADO"
+horizontal_alignment = 1
+
+[node name="BtnReanudar" type="Button" parent="PanelCentral/CajaBotones" unique_id=301147863]
+custom_minimum_size = Vector2(220, 50)
+layout_mode = 2
+text = "Reanudar"
+
+[node name="BtnSalir" type="Button" parent="PanelCentral/CajaBotones" unique_id=1204122405]
+custom_minimum_size = Vector2(220, 50)
+layout_mode = 2
+text = "Salir del partido"
+
+[node name="DialogoConfirmarSalida" type="ConfirmationDialog" parent="." unique_id=1205278176]
+title = "¿Salir del partido?"
+initial_position = 2
+size = Vector2i(380, 140)
+ok_button_text = "Sí, salir"
+cancel_button_text = "Cancelar"
+
+[node name="TextoDialogo" type="Label" parent="DialogoConfirmarSalida" unique_id=1792204284]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+horizontal_alignment = 1
+vertical_alignment = 1

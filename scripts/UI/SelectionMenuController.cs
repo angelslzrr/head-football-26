@@ -1,11 +1,6 @@
 using Godot;
 using System.Collections.Generic;
 
-/// <summary>
-/// Controlador de la interfaz de selección de equipos y confederaciones.
-/// Ofrece una experiencia visual interesante con previsualización dinámica de estadísticas,
-/// mapas regionales, animación escalada de tarjetas (Juice) y composición de sprites por capas.
-/// </summary>
 public partial class SelectionMenuController : Control
 {
     private GridContainer _gridEquipos;
@@ -15,7 +10,7 @@ public partial class SelectionMenuController : Control
     private TextureRect _previewBandera;
     private Label _previewNombre;
     private HBoxContainer _previewEstrellas;
-    
+
     private TextureRect _previewCabeza;
     private TextureRect _previewCamiseta;
     private Button _btnComenzar;
@@ -23,8 +18,9 @@ public partial class SelectionMenuController : Control
     private Texture2D _texEstrellaLlena;
     private Texture2D _texEstrellaMedia;
 
-    private List<TeamData> _equiposSudamerica;
+    private Dictionary<string, List<TeamData>> _cacheEquiposPorRegion = new();
     private TeamData _equipoSeleccionado;
+    private string _regionActual;
 
     public override void _Ready()
     {
@@ -35,7 +31,7 @@ public partial class SelectionMenuController : Control
         _previewBandera = GetNode<TextureRect>("Layout/ContenidoPrincipal/PanelDerecho/ContenidoDerecho/PreviewBandera");
         _previewNombre = GetNode<Label>("Layout/ContenidoPrincipal/PanelDerecho/ContenidoDerecho/PreviewNombre");
         _previewEstrellas = GetNode<HBoxContainer>("Layout/ContenidoPrincipal/PanelDerecho/ContenidoDerecho/PreviewEstrellas");
-        
+
         _previewCabeza = GetNode<TextureRect>("Layout/ContenidoPrincipal/PanelDerecho/ContenidoDerecho/ComposicionSprite/PreviewCabeza");
         _previewCamiseta = GetNode<TextureRect>("Layout/ContenidoPrincipal/PanelDerecho/ContenidoDerecho/ComposicionSprite/PreviewCamiseta");
         _btnComenzar = GetNode<Button>("Layout/PanelInferior/BtnComenzar");
@@ -51,9 +47,8 @@ public partial class SelectionMenuController : Control
         ConectarFiltro("BtnNorteYCentro", "Norte y Centroamérica");
         ConectarFiltro("BtnAfrica", "África");
         ConectarFiltro("BtnAsia", "Asia");
-        ConectarFiltro("BtnOceania", "Oceanía");
+        ConectarFiltro("BtnOceania", "Oceania");
 
-        _equiposSudamerica = RepositorioEquipos.ObtenerEquiposConmebol();
         MostrarRegion("Sudamérica");
     }
 
@@ -68,12 +63,18 @@ public partial class SelectionMenuController : Control
 
     private void MostrarRegion(string region)
     {
+        _regionActual = region;
+
+        if (!_cacheEquiposPorRegion.TryGetValue(region, out List<TeamData> equipos))
+        {
+            equipos = RepositorioEquipos.ObtenerEquiposPorRegion(region);
+            _cacheEquiposPorRegion[region] = equipos;
+        }
+
         foreach (Node hijo in _gridEquipos.GetChildren())
         {
             hijo.QueueFree();
         }
-
-        List<TeamData> equipos = region == "Sudamérica" ? _equiposSudamerica : new List<TeamData>();
 
         _mensajeVacio.Visible = equipos.Count == 0;
 
@@ -115,16 +116,17 @@ public partial class SelectionMenuController : Control
             hbox.AddChild(texto);
 
             carta.AddChild(hbox);
-            
-            // Animaciones suaves (Tweens) al pasar el cursor sobre las tarjetas de equipo.
-            carta.MouseEntered += () => 
+
+            carta.MouseEntered += () =>
             {
+                if (!GodotObject.IsInstanceValid(carta)) return;
                 Tween tween = carta.CreateTween();
                 tween.TweenProperty(carta, "scale", new Vector2(1.05f, 1.05f), 0.1f).SetTrans(Tween.TransitionType.Sine);
             };
 
-            carta.MouseExited += () => 
+            carta.MouseExited += () =>
             {
+                if (!GodotObject.IsInstanceValid(carta)) return;
                 Tween tween = carta.CreateTween();
                 tween.TweenProperty(carta, "scale", Vector2.One, 0.1f).SetTrans(Tween.TransitionType.Sine);
             };
@@ -139,7 +141,12 @@ public partial class SelectionMenuController : Control
 
     private void ActualizarMapaRegion(string region)
     {
-        string ruta = region == "Sudamérica" ? "res://img/mapas/mapaConmebol.png" : null;
+        string ruta = region switch
+        {
+            "Sudamérica" => "res://img/mapas/mapaConmebol.png",
+            "Oceania" => "res://img/mapas/mapaOfc.png",
+            _ => null
+        };
 
         _mapaRegionFondo.Texture = (ruta != null && ResourceLoader.Exists(ruta))
             ? GD.Load<Texture2D>(ruta)
@@ -171,7 +178,6 @@ public partial class SelectionMenuController : Control
         _btnComenzar.Disabled = false;
     }
 
-    // Renderiza gráficamente las estrellas completas, medias o vacías (con tintes semitransparentes).
     private void DibujarEstrellas(float calificacion)
     {
         foreach (Node hijo in _previewEstrellas.GetChildren())
@@ -181,10 +187,7 @@ public partial class SelectionMenuController : Control
 
         for (int i = 1; i <= 5; i++)
         {
-            Control slot = new Control
-            {
-                CustomMinimumSize = new Vector2(24, 24)
-            };
+            Control slot = new Control { CustomMinimumSize = new Vector2(24, 24) };
 
             if (calificacion >= i)
             {

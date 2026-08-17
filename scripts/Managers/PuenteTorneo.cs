@@ -1,24 +1,18 @@
 using Godot;
 
-/// <summary>
-/// Singleton (Autoload) diseñado para la inyección de dependencias efímeras.
-/// Su única responsabilidad es transportar datos temporales durante la transición 
-/// entre la escena de Interfaz (TournamentHub) y la escena de Gameplay (Cancha).
-/// No persiste en disco; su ciclo de vida se limpia tras cada partido.
-/// </summary>
 public partial class PuenteTorneo : Node
 {
     public static PuenteTorneo Instance { get; private set; }
 
     public bool PartidoDeTorneo { get; private set; } = false;
 
-    // Almacena los roles claros para el motor de gameplay, independientemente
-    // de quién sea el local o el visitante en el fixture.
     public string EquipoJugador { get; private set; } = "";
     public string EquipoRival { get; private set; } = "";
     
-    // Necesario para reconstruir el fixture correctamente al regresar al menú.
     public bool JugadorEsLocal { get; private set; } = true;
+
+    // NUEVO: le dice al Hud si este partido puede terminar en Gol de Oro.
+    public bool EsFaseEliminacion { get; private set; } = false;
 
     public int GolesJugador { get; private set; } = 0;
     public int GolesRival { get; private set; } = 0;
@@ -28,12 +22,13 @@ public partial class PuenteTorneo : Node
         Instance = this;
     }
 
-    public void IniciarPartidoDeTorneo(string equipoJugador, string equipoRival, bool jugadorEsLocal)
+    public void IniciarPartidoDeTorneo(string equipoJugador, string equipoRival, bool jugadorEsLocal, bool esFaseEliminacion)
     {
         PartidoDeTorneo = true;
         EquipoJugador = equipoJugador;
         EquipoRival = equipoRival;
         JugadorEsLocal = jugadorEsLocal;
+        EsFaseEliminacion = esFaseEliminacion;
     }
 
     public void GuardarResultado(int golesJugador, int golesRival)
@@ -47,5 +42,6 @@ public partial class PuenteTorneo : Node
         PartidoDeTorneo = false;
         EquipoJugador = "";
         EquipoRival = "";
+        EsFaseEliminacion = false; 
     }
 }

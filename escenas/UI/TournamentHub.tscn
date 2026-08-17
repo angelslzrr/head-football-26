@@ -37,6 +37,10 @@ text = "Eliminatorias"
 horizontal_alignment = 1
 vertical_alignment = 1
 
+[node name="DropdownHistorial" type="OptionButton" parent="Layout" unique_id=2144516754]
+custom_minimum_size = Vector2(280, 0)
+layout_mode = 2
+
 [node name="Pestanas" type="TabContainer" parent="Layout" unique_id=236791141]
 layout_mode = 2
 size_flags_vertical = 3
@@ -114,13 +118,10 @@ size_flags_vertical = 3
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="GridPosiciones" type="GridContainer" parent="Layout/Pestanas/Posiciones/ContenedorPosiciones/FondoTabla/ScrollPosiciones" unique_id=1190638233]
+[node name="ContenedorDinamicoPosiciones" type="VBoxContainer" parent="Layout/Pestanas/Posiciones/ContenedorPosiciones/FondoTabla/ScrollPosiciones" unique_id=1284417633]
 layout_mode = 2
 size_flags_horizontal = 6
 size_flags_vertical = 6
-theme_override_constants/h_separation = 2
-theme_override_constants/v_separation = 2
-columns = 8
 
 [node name="Fixture" type="VBoxContainer" parent="Layout/Pestanas" unique_id=731072571]
 visible = false
@@ -214,3 +215,7 @@ text = "Volver al menú"
 custom_minimum_size = Vector2(200, 50)
 layout_mode = 2
 text = "Simular partido"
+
+[node name="DialogoRepechaje" type="AcceptDialog" parent="." unique_id=482877464]
+title = "¡Felicidades!"
+ok_button_text = "Entendido"

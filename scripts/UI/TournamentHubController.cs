@@ -1,25 +1,14 @@
 using Godot;
-using System.Collections.Generic;
 using System.Linq;
 
-/// <summary>
-/// Controlador central del centro de torneos (TournamentHub).
-/// Administra la visualización de la tabla de posiciones con cebra y resaltados,
-/// el calendario de partidos (Fixture), la simulación automatizada de jornadas, 
-/// la tarjeta de previa de partidos y la sincronización con el resultado del gameplay.
-/// </summary>
 public partial class TournamentHubController : Control
 {
     private const string RutaMainMenu = "res://escenas/UI/MainMenu.tscn";
     private const string RutaCancha = "res://escenas/cancha.tscn";
 
-    private static readonly Color ColorFilaPar = new Color(0.06f, 0.12f, 0.07f, 0.5f);
-    private static readonly Color ColorFilaImpar = new Color(0.03f, 0.07f, 0.04f, 0.5f);
-    private static readonly Color ColorFilaJugador = new Color(0.87f, 0.73f, 0f, 0.16f);
-    private static readonly Color ColorBordeJugador = new Color(0.9f, 0.78f, 0.15f, 1f);
-    private static readonly Color ColorEncabezado = new Color(0.9f, 0.78f, 0.15f, 1f);
-    private static readonly Color ColorTransparente = new Color(0, 0, 0, 0);
+    private Label _titulo;
 
+    private Control _panelDetallesEquipo;
     private TextureRect _mapaRegionFondo;
     private TextureRect _previewBandera;
     private Label _previewNombre;
@@ -29,8 +18,7 @@ public partial class TournamentHubController : Control
     private Texture2D _texEstrellaLlena;
     private Texture2D _texEstrellaMedia;
 
-    private Label _titulo;
-    private GridContainer _gridPosiciones;
+    private VBoxContainer _contenedorPosiciones;
     private VBoxContainer _listaFixture;
     private Label _mensajePartidoJugador;
     private Button _btnSimularJornada;
@@ -42,14 +30,26 @@ public partial class TournamentHubController : Control
     private Label _nombresPrevia;
 
     private TournamentState _estado;
-    private List<TeamData> _equipos;
+    private System.Collections.Generic.List<TeamData> _equipos;
+    private IRenderizadorFase _renderizadorActual;
+
+    private TabContainer _pestanas;
+    private AcceptDialog _dialogoRepechaje;
+
+    private OptionButton _dropdownHistorial;
+    private int _indiceFaseVisualizada = 0;
 
     public override void _Ready()
     {
         var musica = GetNode<AudioStreamPlayer>("/root/MusicaGlobal");
         if (!musica.Playing) musica.Play();
+
         _titulo = GetNode<Label>("Layout/Titulo");
-        
+        _pestanas = GetNode<TabContainer>("Layout/Pestanas");
+        _dialogoRepechaje = GetNode<AcceptDialog>("DialogoRepechaje");
+        _dropdownHistorial = GetNode<OptionButton>("Layout/DropdownHistorial");
+
+        _panelDetallesEquipo = GetNode<Control>("Layout/Pestanas/Posiciones/ContenedorPosiciones/PanelDetallesEquipo");
         _mapaRegionFondo = GetNode<TextureRect>("Layout/Pestanas/Posiciones/ContenedorPosiciones/PanelDetallesEquipo/MapaRegionFondo");
         _previewBandera = GetNode<TextureRect>("Layout/Pestanas/Posiciones/ContenedorPosiciones/PanelDetallesEquipo/ContenidoDetalles/PreviewBandera");
         _previewNombre = GetNode<Label>("Layout/Pestanas/Posiciones/ContenedorPosiciones/PanelDetallesEquipo/ContenidoDetalles/PreviewNombre");
@@ -60,24 +60,22 @@ public partial class TournamentHubController : Control
         _texEstrellaLlena = GD.Load<Texture2D>("res://img/estrellaCompleta.png");
         _texEstrellaMedia = GD.Load<Texture2D>("res://img/estrellaMitad.png");
 
-        _gridPosiciones = GetNode<GridContainer>("Layout/Pestanas/Posiciones/ContenedorPosiciones/FondoTabla/ScrollPosiciones/GridPosiciones");
+        _contenedorPosiciones = GetNode<VBoxContainer>("Layout/Pestanas/Posiciones/ContenedorPosiciones/FondoTabla/ScrollPosiciones/ContenedorDinamicoPosiciones");
         _listaFixture = GetNode<VBoxContainer>("Layout/Pestanas/Fixture/ContenedorFixture/FondoFixture/ScrollFixture/ListaFixture");
-        
+
         _panelPrevia = GetNode<Control>("Layout/Pestanas/Fixture/ContenedorFixture/PanelPrevia");
         _cabezaLocal = GetNode<TextureRect>("Layout/Pestanas/Fixture/ContenedorFixture/PanelPrevia/ContenidoPrevia/DueloCabezones/CabezaLocal");
         _cabezaVisitante = GetNode<TextureRect>("Layout/Pestanas/Fixture/ContenedorFixture/PanelPrevia/ContenidoPrevia/DueloCabezones/CabezaVisitante");
         _nombresPrevia = GetNode<Label>("Layout/Pestanas/Fixture/ContenedorFixture/PanelPrevia/ContenidoPrevia/NombresPrevia");
-        
+
         _mensajePartidoJugador = GetNode<Label>("Layout/MensajePartidoJugador");
         _btnSimularJornada = GetNode<Button>("Layout/BarraInferior/BtnSimularJornada");
         _btnVolver = GetNode<Button>("Layout/BarraInferior/BtnVolver");
 
-        _btnSimularJornada.Pressed += SimularJornadaActual;
+        _btnSimularJornada.Pressed += AvanzarSimulacion;
         _btnVolver.Pressed += () => GetTree().ChangeSceneToFile(RutaMainMenu);
 
-        _equipos = RepositorioEquipos.ObtenerEquiposConmebol();
         _estado = GestorGuardado.Instance.CargarTorneo();
-
         if (_estado == null)
         {
             GD.PrintErr("No hay ningún torneo guardado. Volviendo al menú.");
@@ -85,205 +83,191 @@ public partial class TournamentHubController : Control
             return;
         }
 
-        // Procesa el resultado si el jugador viene de disputar un partido en la escena de Cancha.
+        _equipos = RepositorioEquipos.ObtenerEquiposPorRegion(_estado.Region);
+
         if (PuenteTorneo.Instance.PartidoDeTorneo)
         {
-            bool jugadorEsLocal = PuenteTorneo.Instance.JugadorEsLocal;
-            int golesLocal = jugadorEsLocal ? PuenteTorneo.Instance.GolesJugador : PuenteTorneo.Instance.GolesRival;
-            int golesVisitante = jugadorEsLocal ? PuenteTorneo.Instance.GolesRival : PuenteTorneo.Instance.GolesJugador;
-
-            ResolverPartidoJugador(golesLocal, golesVisitante);
+            ResolverPartidoJugador();
             PuenteTorneo.Instance.FinalizarPartidoDeTorneo();
         }
 
-        _titulo.Text = $"Eliminatoria — {_estado.Region}";
-
-        // Genera el fixture y la tabla inicial si es un torneo completamente nuevo.
-        if (_estado.Calendario.Count == 0)
+        if (_estado.Fases == null || _estado.Fases.Count == 0)
         {
-            List<string> nombres = _equipos.Select(e => e.TeamName).ToList();
-            _estado.Calendario = GeneradorFixture.GenerarFixtureIdaYVuelta(nombres);
-            _estado.TablaPosiciones = nombres
-                .Select(nombre => new EstadisticasEquipoGuardado { NombreEquipo = nombre })
-                .ToList();
-
+            var fases = RepositorioFormatos.ObtenerFormatoPorRegion(_estado.Region);
+            var nombresEquipos = _equipos.Select(e => e.TeamName).ToList();
+            GestorTorneo.IniciarTorneo(_estado, fases, nombresEquipos);
             GestorGuardado.Instance.GuardarTorneo(_estado);
         }
 
         CargarPanelJugador();
-        DibujarTablaPosiciones();
-        DibujarFixture();
-
-        ActualizarInterfazJornada();
-        ActualizarPanelPrevia();
+        SincronizarDropdownConPresente();
+        _dropdownHistorial.ItemSelected += OnFaseHistorialSeleccionada;
+        RedibujarTodo();
     }
 
-    private void ActualizarInterfazJornada()
-    {
-        int ultimaJornada = _estado.Calendario.Max(p => p.Jornada);
+    private bool EsEquipoDelJugador(string nombreEquipo) => nombreEquipo == _estado.NombreEquipoJugador;
 
-        if (_estado.JornadaActual > ultimaJornada)
+    private void ResolverPartidoJugador()
+    {
+        bool jugadorEsLocal = PuenteTorneo.Instance.JugadorEsLocal;
+        int golesLocal = jugadorEsLocal ? PuenteTorneo.Instance.GolesJugador : PuenteTorneo.Instance.GolesRival;
+        int golesVisitante = jugadorEsLocal ? PuenteTorneo.Instance.GolesRival : PuenteTorneo.Instance.GolesJugador;
+
+        string local = jugadorEsLocal ? _estado.NombreEquipoJugador : PuenteTorneo.Instance.EquipoRival;
+        string visitante = jugadorEsLocal ? PuenteTorneo.Instance.EquipoRival : _estado.NombreEquipoJugador;
+
+        FaseTorneo faseDelPartido = _estado.FaseActual; 
+
+        GestorTorneo.ProcesarResultado(_estado, local, visitante, golesLocal, golesVisitante);
+
+        int golesJugador = jugadorEsLocal ? golesLocal : golesVisitante;
+        int golesRival = jugadorEsLocal ? golesVisitante : golesLocal;
+        DetectarEliminacionInmediata(faseDelPartido, golesJugador, golesRival);
+
+        GestorTorneo.AvanzarFaseSiCorresponde(_estado);
+        DetectarEliminacionPorClasificacion(faseDelPartido);
+
+        GestorGuardado.Instance.GuardarTorneo(_estado);
+    }
+
+    private void RedibujarTodo()
+    {
+        FaseTorneo faseAMostrar = FaseVisualizada;
+
+        if (faseAMostrar == null)
+        {
+            foreach (Node hijo in _contenedorPosiciones.GetChildren()) hijo.QueueFree();
+            foreach (Node hijo in _listaFixture.GetChildren()) hijo.QueueFree();
+            _titulo.Text = $"{_estado.Region} — Torneo finalizado";
+            ActualizarInterfazFase();
+            _panelPrevia.Visible = false;
+            return;
+        }
+
+        _renderizadorActual = RenderizadorFactory.ObtenerRenderizador(faseAMostrar.Tipo);
+        _panelDetallesEquipo.Visible = !_renderizadorActual.OcultaPanelDetalleEquipo;
+        AplicarVisibilidadPestanas(faseAMostrar.Tipo);
+
+        _renderizadorActual.DibujarPosiciones(_contenedorPosiciones, faseAMostrar, _estado.NombreEquipoJugador);
+        _renderizadorActual.DibujarFixture(_listaFixture, faseAMostrar, _estado.NombreEquipoJugador);
+
+        string sufijo = EstaViendoPresente() ? "" : "  (Historial)";
+        _titulo.Text = $"{_estado.Region} — {faseAMostrar.Nombre}{sufijo}";
+
+        ActualizarInterfazFase();
+        ActualizarPanelPrevia();
+        DetectarYMostrarRepechaje();
+    }
+
+    private void ActualizarInterfazFase()
+    {
+        if (!EstaViendoPresente())
+        {
+            _btnSimularJornada.Visible = false;
+            _mensajePartidoJugador.Visible = true;
+            _mensajePartidoJugador.Text = "Estás viendo el historial de una fase anterior. " +
+                                           "Selecciona la fase (Actual) en el menú para volver a jugar.";
+            return;
+        }
+
+        _btnSimularJornada.Visible = true;
+
+        FaseTorneo fase = _estado.FaseActual;
+
+        if (fase == null || EstaTorneoFinalizado())
         {
             _btnSimularJornada.Disabled = true;
             _btnSimularJornada.Text = "Torneo Finalizado";
             _mensajePartidoJugador.Visible = true;
-            _mensajePartidoJugador.Text = "¡La eliminatoria ha concluido!";
+            _mensajePartidoJugador.Text = _estado.JugadorEliminado
+                ? "El torneo terminó. Revisa el árbol para ver quién se coronó campeón."
+                : "¡El torneo ha concluido!";
             return;
         }
 
-        bool esUltimaJornada = _estado.JornadaActual == ultimaJornada;
+        if (_estado.JugadorEliminado)
+        {
+            _btnSimularJornada.Disabled = false;
+            _btnSimularJornada.Text = "Simular resto del torneo";
+            _mensajePartidoJugador.Visible = true;
+            _mensajePartidoJugador.Text = "Fuiste eliminado de la competencia. Simula el resto para ver quién gana.";
+            return;
+        }
 
-        if (esUltimaJornada)
+        _btnSimularJornada.Disabled = false;
+
+        var unidadPendiente = GestorTorneo.ObtenerUnidadPendiente(fase);
+        var partidoJugador = unidadPendiente.FirstOrDefault(p => EsEquipoDelJugador(p.Local) || EsEquipoDelJugador(p.Visitante));
+
+        if (partidoJugador != default)
         {
             _btnSimularJornada.Text = "Jugar partido";
             _mensajePartidoJugador.Visible = true;
-            _mensajePartidoJugador.Text = "Última jornada, todos juegan al mismo tiempo, los resultados se sabrán al terminar tu partido.";
+            _mensajePartidoJugador.Text = $"Te toca jugar: {partidoJugador.Local} vs {partidoJugador.Visitante}.";
         }
         else
         {
-            PartidoFixture siguientePartido = _estado.Calendario.FirstOrDefault(p => p.Jornada == _estado.JornadaActual && !p.Jugado);
-            if (siguientePartido == null) return;
-
-            bool juegaEquipoJugador = siguientePartido.EquipoLocal == _estado.NombreEquipoJugador || siguientePartido.EquipoVisitante == _estado.NombreEquipoJugador;
-
-            if (juegaEquipoJugador)
-            {
-                _btnSimularJornada.Text = "Jugar partido";
-                _mensajePartidoJugador.Visible = true;
-                _mensajePartidoJugador.Text = $"Te toca jugar: {siguientePartido.EquipoLocal} vs {siguientePartido.EquipoVisitante}.";
-            }
-            else
-            {
-                _btnSimularJornada.Text = "Simular partido";
-                _mensajePartidoJugador.Visible = false;
-            }
+            _btnSimularJornada.Text = fase.Tipo == TipoFormato.Eliminacion ? "Simular ronda" : "Simular jornada";
+            _mensajePartidoJugador.Visible = false;
         }
     }
 
-    private void SimularJornadaActual()
+    private void AvanzarSimulacion()
     {
-        int ultimaJornada = _estado.Calendario.Max(p => p.Jornada);
-        bool esUltimaJornada = _estado.JornadaActual == ultimaJornada;
-
-        if (esUltimaJornada)
+        if (_estado.JugadorEliminado)
         {
-            PartidoFixture partidoJugador = _estado.Calendario.FirstOrDefault(p =>
-                p.Jornada == _estado.JornadaActual && !p.Jugado &&
-                (p.EquipoLocal == _estado.NombreEquipoJugador || p.EquipoVisitante == _estado.NombreEquipoJugador));
-
-            if (partidoJugador != null)
-            {
-                var otrosPartidos = _estado.Calendario.Where(p =>
-                    p.Jornada == _estado.JornadaActual && !p.Jugado && p != partidoJugador).ToList();
-
-                foreach (var otro in otrosPartidos)
-                {
-                    SimularYRegistrar(otro);
-                }
-                GestorGuardado.Instance.GuardarTorneo(_estado);
-
-                bool jugadorEsLocal = partidoJugador.EquipoLocal == _estado.NombreEquipoJugador;
-                string rival = jugadorEsLocal ? partidoJugador.EquipoVisitante : partidoJugador.EquipoLocal;
-
-                PuenteTorneo.Instance.IniciarPartidoDeTorneo(_estado.NombreEquipoJugador, rival, jugadorEsLocal);
-                GetTree().ChangeSceneToFile(RutaCancha);
-                return;
-            }
+            SimularRestoDelTorneo();
+            return;
         }
-        else
+
+        FaseTorneo fase = _estado.FaseActual;
+        if (fase == null) return;
+
+        var unidadPendiente = GestorTorneo.ObtenerUnidadPendiente(fase);
+        var partidoJugador = unidadPendiente.FirstOrDefault(p => EsEquipoDelJugador(p.Local) || EsEquipoDelJugador(p.Visitante));
+
+        if (partidoJugador != default)
         {
-            PartidoFixture siguientePartido = _estado.Calendario.FirstOrDefault(p => p.Jornada == _estado.JornadaActual && !p.Jugado);
-            if (siguientePartido == null) return;
+            bool jugadorEsLocal = EsEquipoDelJugador(partidoJugador.Local);
+            string rival = jugadorEsLocal ? partidoJugador.Visitante : partidoJugador.Local;
 
-            bool juegaEquipoJugador = siguientePartido.EquipoLocal == _estado.NombreEquipoJugador || siguientePartido.EquipoVisitante == _estado.NombreEquipoJugador;
-
-            if (juegaEquipoJugador)
+            foreach (var partido in unidadPendiente)
             {
-                bool jugadorEsLocal = siguientePartido.EquipoLocal == _estado.NombreEquipoJugador;
-                string rival = jugadorEsLocal ? siguientePartido.EquipoVisitante : siguientePartido.EquipoLocal;
-
-                PuenteTorneo.Instance.IniciarPartidoDeTorneo(_estado.NombreEquipoJugador, rival, jugadorEsLocal);
-                GetTree().ChangeSceneToFile(RutaCancha);
-                return;
+                if (EsEquipoDelJugador(partido.Local) || EsEquipoDelJugador(partido.Visitante)) continue;
+                SimularYRegistrar(partido.Local, partido.Visitante);
             }
-
-            SimularYRegistrar(siguientePartido);
-            VerificarFinDeJornada();
-
             GestorGuardado.Instance.GuardarTorneo(_estado);
-            DibujarTablaPosiciones();
-            DibujarFixture();
-            ActualizarInterfazJornada();
-            ActualizarPanelPrevia();
+
+            bool esEliminacion = fase.Tipo == TipoFormato.Eliminacion;
+            PuenteTorneo.Instance.IniciarPartidoDeTorneo(_estado.NombreEquipoJugador, rival, jugadorEsLocal, esEliminacion);
+            GetTree().ChangeSceneToFile(RutaCancha);
+            return;
         }
-    }
 
-    public void ResolverPartidoJugador(int golesLocal, int golesVisitante)
-    {
-        PartidoFixture partido = _estado.Calendario.FirstOrDefault(p =>
-            p.Jornada == _estado.JornadaActual && !p.Jugado &&
-            (p.EquipoLocal == _estado.NombreEquipoJugador || p.EquipoVisitante == _estado.NombreEquipoJugador));
+        foreach (var partido in unidadPendiente)
+            SimularYRegistrar(partido.Local, partido.Visitante);
 
-        if (partido == null) return;
+        FaseTorneo faseAntesDeAvanzar = fase;
+        GestorTorneo.AvanzarFaseSiCorresponde(_estado);
+        DetectarEliminacionPorClasificacion(faseAntesDeAvanzar);
 
-        RegistrarResultado(partido, golesLocal, golesVisitante);
-        VerificarFinDeJornada();
         GestorGuardado.Instance.GuardarTorneo(_estado);
-
-        DibujarTablaPosiciones();
-        DibujarFixture();
-        ActualizarInterfazJornada();
-        ActualizarPanelPrevia();
+        SincronizarDropdownConPresente();
+        RedibujarTodo();
     }
 
-    private void VerificarFinDeJornada()
+    private void SimularYRegistrar(string local, string visitante)
     {
-        bool faltanPartidos = _estado.Calendario.Any(p => p.Jornada == _estado.JornadaActual && !p.Jugado);
-        if (!faltanPartidos)
-        {
-            _estado.JornadaActual++;
-        }
-    }
-
-    private void SimularYRegistrar(PartidoFixture partido)
-    {
-        float estrellasLocal = ObtenerEstrellas(partido.EquipoLocal);
-        float estrellasVisitante = ObtenerEstrellas(partido.EquipoVisitante);
+        float estrellasLocal = ObtenerEstrellas(local);
+        float estrellasVisitante = ObtenerEstrellas(visitante);
         (int golesLocal, int golesVisitante) = SimulationEngine.SimularPartido(estrellasLocal, estrellasVisitante);
-        RegistrarResultado(partido, golesLocal, golesVisitante);
-    }
 
-    private void RegistrarResultado(PartidoFixture partido, int golesLocal, int golesVisitante)
-    {
-        partido.GolesLocal = golesLocal;
-        partido.GolesVisitante = golesVisitante;
-        partido.Jugado = true;
-
-        EstadisticasEquipoGuardado local = _estado.TablaPosiciones.First(e => e.NombreEquipo == partido.EquipoLocal);
-        EstadisticasEquipoGuardado visitante = _estado.TablaPosiciones.First(e => e.NombreEquipo == partido.EquipoVisitante);
-
-        local.Jugados++;
-        visitante.Jugados++;
-        local.GolesFavor += golesLocal;
-        local.GolesContra += golesVisitante;
-        visitante.GolesFavor += golesVisitante;
-        visitante.GolesContra += golesLocal;
-
-        if (golesLocal > golesVisitante)
+        if (_estado.FaseActual.Tipo == TipoFormato.Eliminacion)
         {
-            local.Ganados++;
-            visitante.Perdidos++;
+            (golesLocal, golesVisitante) = SimulationEngine.ResolverEmpateSiCorresponde(local, visitante, golesLocal, golesVisitante);
         }
-        else if (golesLocal < golesVisitante)
-        {
-            visitante.Ganados++;
-            local.Perdidos++;
-        }
-        else
-        {
-            local.Empatados++;
-            visitante.Empatados++;
-        }
+
+        GestorTorneo.ProcesarResultado(_estado, local, visitante, golesLocal, golesVisitante);
     }
 
     private float ObtenerEstrellas(string nombreEquipo)
@@ -292,253 +276,6 @@ public partial class TournamentHubController : Control
         return equipo?.StarRating ?? 3.0f;
     }
 
-    // ================== TABLA DE POSICIONES ==================
-    private void DibujarTablaPosiciones()
-    {
-        foreach (Node hijo in _gridPosiciones.GetChildren()) hijo.QueueFree();
-
-        string[] encabezados = { "#", "Equipo", "PJ", "G", "E", "P", "DG", "Pts" };
-        int[] anchos = { 60, 380, 70, 70, 70, 70, 80, 70 };
-
-        for (int i = 0; i < encabezados.Length; i++)
-        {
-            AgregarCelda(encabezados[i], ColorTransparente, anchos[i], esEncabezado: true);
-        }
-
-        List<EstadisticasEquipoGuardado> ordenados = _estado.TablaPosiciones
-            .OrderByDescending(e => e.Puntos)
-            .ThenByDescending(e => e.DiferenciaGoles)
-            .ThenByDescending(e => e.GolesFavor)
-            .ToList();
-
-        var celdasParaAnimar = new List<Control>();
-
-        for (int i = 0; i < ordenados.Count; i++)
-        {
-            EstadisticasEquipoGuardado equipo = ordenados[i];
-            bool esJugador = equipo.NombreEquipo == _estado.NombreEquipoJugador;
-            Color colorFila = esJugador ? ColorFilaJugador : (i % 2 == 0 ? ColorFilaPar : ColorFilaImpar);
-            string nombreMostrado = equipo.NombreEquipo;
-
-            int inicioFila = _gridPosiciones.GetChildCount();
-
-            AgregarCelda((i + 1).ToString(), colorFila, anchos[0], bordeIzquierdo: esJugador);
-            AgregarCelda(nombreMostrado, colorFila, anchos[1], alineacion: HorizontalAlignment.Center);
-            AgregarCelda(equipo.Jugados.ToString(), colorFila, anchos[2]);
-            AgregarCelda(equipo.Ganados.ToString(), colorFila, anchos[3]);
-            AgregarCelda(equipo.Empatados.ToString(), colorFila, anchos[4]);
-            AgregarCelda(equipo.Perdidos.ToString(), colorFila, anchos[5]);
-            AgregarCelda(equipo.DiferenciaGoles.ToString(), colorFila, anchos[6]);
-            AgregarCelda(equipo.Puntos.ToString(), colorFila, anchos[7]);
-
-            for (int c = inicioFila; c < _gridPosiciones.GetChildCount(); c++)
-            {
-                celdasParaAnimar.Add(_gridPosiciones.GetChild<Control>(c));
-            }
-        }
-
-        AnimarAparicionEscalonada(celdasParaAnimar, celdasPorFila: 8);
-    }
-
-    private void AgregarCelda(
-        string texto,
-        Color colorFondo,
-        int anchoMinimo,
-        bool esEncabezado = false,
-        bool bordeIzquierdo = false,
-        HorizontalAlignment alineacion = HorizontalAlignment.Center)
-    {
-        var estilo = new StyleBoxFlat
-        {
-            BgColor = colorFondo,
-            ContentMarginLeft = 6,
-            ContentMarginRight = 6,
-            ContentMarginTop = 8,
-            ContentMarginBottom = 8
-        };
-
-        if (esEncabezado)
-        {
-            estilo.BorderColor = new Color(ColorEncabezado.R, ColorEncabezado.G, ColorEncabezado.B, 0.6f);
-            estilo.BorderWidthBottom = 2;
-        }
-
-        if (bordeIzquierdo)
-        {
-            estilo.BorderColor = ColorBordeJugador;
-            estilo.BorderWidthLeft = 3;
-        }
-
-        var panel = new PanelContainer();
-        panel.AddThemeStyleboxOverride("panel", estilo);
-        panel.CustomMinimumSize = new Vector2(anchoMinimo, 0);
-
-        var label = new Label
-        {
-            Text = texto,
-            HorizontalAlignment = alineacion,
-            SizeFlagsHorizontal = SizeFlags.ExpandFill
-        };
-
-        if (esEncabezado) label.AddThemeColorOverride("font_color", ColorEncabezado);
-
-        panel.AddChild(label);
-        _gridPosiciones.AddChild(panel);
-    }
-
-    // ================== FIXTURE ==================
-    private void DibujarFixture()
-    {
-        foreach (Node hijo in _listaFixture.GetChildren()) hijo.QueueFree();
-
-        var porJornada = _estado.Calendario.GroupBy(p => p.Jornada).OrderBy(grupo => grupo.Key);
-        var filasParaAnimar = new List<Control>();
-
-        foreach (var grupo in porJornada)
-        {
-            _listaFixture.AddChild(CrearEncabezadoJornada(grupo.Key));
-
-            foreach (PartidoFixture partido in grupo)
-            {
-                Control fila = CrearFilaPartido(partido);
-                _listaFixture.AddChild(fila);
-                filasParaAnimar.Add(fila);
-            }
-
-            _listaFixture.AddChild(new Control { CustomMinimumSize = new Vector2(0, 8) });
-        }
-
-        AnimarAparicionEscalonada(filasParaAnimar, celdasPorFila: 1);
-    }
-
-    private Control CrearEncabezadoJornada(int numeroJornada)
-    {
-        var contenedor = new VBoxContainer();
-        contenedor.AddThemeConstantOverride("separation", 3);
-
-        var label = new Label
-        {
-            Text = $"Jornada {numeroJornada}",
-            HorizontalAlignment = HorizontalAlignment.Left
-        };
-        label.AddThemeFontSizeOverride("font_size", 17);
-        label.AddThemeColorOverride("font_color", ColorEncabezado);
-
-        var linea = new HSeparator();
-        var estiloLinea = new StyleBoxFlat
-        {
-            BgColor = new Color(ColorEncabezado.R, ColorEncabezado.G, ColorEncabezado.B, 0.35f),
-            ContentMarginTop = 1,
-            ContentMarginBottom = 1
-        };
-        linea.AddThemeStyleboxOverride("separator", estiloLinea);
-
-        contenedor.AddChild(label);
-        contenedor.AddChild(linea);
-        return contenedor;
-    }
-
-    private Control CrearFilaPartido(PartidoFixture partido)
-    {
-        bool jugadorLocal = partido.EquipoLocal == _estado.NombreEquipoJugador;
-        bool jugadorVisitante = partido.EquipoVisitante == _estado.NombreEquipoJugador;
-        bool esPartidoJugador = jugadorLocal || jugadorVisitante;
-
-        var estiloFila = new StyleBoxFlat
-        {
-            BgColor = esPartidoJugador ? ColorFilaJugador : ColorTransparente,
-            ContentMarginLeft = 8,
-            ContentMarginRight = 8,
-            ContentMarginTop = 8,
-            ContentMarginBottom = 8
-        };
-        if (esPartidoJugador)
-        {
-            estiloFila.BorderColor = ColorBordeJugador;
-            estiloFila.BorderWidthLeft = 3;
-        }
-
-        var panelFila = new PanelContainer();
-        panelFila.AddThemeStyleboxOverride("panel", estiloFila);
-        panelFila.CustomMinimumSize = new Vector2(550, 0);
-        
-        var fila = new HBoxContainer();
-        fila.AddThemeConstantOverride("separation", 8);
-
-        var labelLocal = new Label
-        {
-            Text = partido.EquipoLocal,
-            HorizontalAlignment = HorizontalAlignment.Right,
-            SizeFlagsHorizontal = SizeFlags.ExpandFill
-        };
-        if (jugadorLocal) labelLocal.AddThemeColorOverride("font_color", ColorBordeJugador);
-
-        var labelVisitante = new Label
-        {
-            Text = partido.EquipoVisitante,
-            HorizontalAlignment = HorizontalAlignment.Left,
-            SizeFlagsHorizontal = SizeFlags.ExpandFill
-        };
-        if (jugadorVisitante) labelVisitante.AddThemeColorOverride("font_color", ColorBordeJugador);
-
-        var contenedorMarcador = new PanelContainer { CustomMinimumSize = new Vector2(64, 0) };
-        var estiloMarcador = new StyleBoxFlat
-        {
-            BgColor = new Color(0.02f, 0.05f, 0.03f, 0.6f),
-            CornerRadiusTopLeft = 6,
-            CornerRadiusTopRight = 6,
-            CornerRadiusBottomLeft = 6,
-            CornerRadiusBottomRight = 6,
-            ContentMarginTop = 3,
-            ContentMarginBottom = 3
-        };
-        contenedorMarcador.AddThemeStyleboxOverride("panel", estiloMarcador);
-
-        var labelMarcador = new Label
-        {
-            Text = partido.Jugado ? $"{partido.GolesLocal} - {partido.GolesVisitante}" : "vs",
-            HorizontalAlignment = HorizontalAlignment.Center
-        };
-        if (partido.Jugado)
-        {
-            labelMarcador.AddThemeFontSizeOverride("font_size", 16);
-            labelMarcador.AddThemeColorOverride("font_color", ColorEncabezado);
-        }
-        else
-        {
-            labelMarcador.AddThemeColorOverride("font_color", new Color(1, 1, 1, 0.5f));
-        }
-
-        contenedorMarcador.AddChild(labelMarcador);
-
-        fila.AddChild(labelLocal);
-        fila.AddChild(contenedorMarcador);
-        fila.AddChild(labelVisitante);
-
-        panelFila.AddChild(fila);
-        return panelFila;
-    }
-
-    private void AnimarAparicionEscalonada(List<Control> elementos, int celdasPorFila)
-    {
-        for (int i = 0; i < elementos.Count; i++)
-        {
-            Control elemento = elementos[i];
-            int fila = i / celdasPorFila;
-
-            elemento.Modulate = new Color(1, 1, 1, 0);
-            Tween tween = CreateTween();
-            tween.TweenInterval(fila * 0.025f);
-            tween.TweenProperty(elemento, "modulate:a", 1.0f, 0.2f);
-        }
-    }
-
-    private void AgregarCelda(string texto, bool negrita = false)
-    {
-        AgregarCelda(texto, ColorTransparente, 0, negrita);
-    }
-
-    // ================== PANEL DEL EQUIPO JUGADOR ==================
     private void CargarPanelJugador()
     {
         TeamData miEquipo = _equipos.FirstOrDefault(e => e.TeamName == _estado.NombreEquipoJugador);
@@ -549,7 +286,12 @@ public partial class TournamentHubController : Control
         _previewCabeza.Texture = miEquipo.CabezaTexture;
         _previewCamiseta.Texture = miEquipo.CamisetaTexture;
 
-        string rutaMapa = _estado.Region == "Sudamérica" ? "res://img/mapas/mapaConmebol.png" : null;
+        string rutaMapa = _estado.Region switch
+        {
+            "Sudamérica" => "res://img/mapas/mapaConmebol.png",
+            "Oceania" => "res://img/mapas/mapaOfc.png",
+            _ => null
+        };
         _mapaRegionFondo.Texture = (rutaMapa != null && ResourceLoader.Exists(rutaMapa)) ? GD.Load<Texture2D>(rutaMapa) : null;
 
         foreach (Node hijo in _previewEstrellas.GetChildren()) hijo.QueueFree();
@@ -559,18 +301,15 @@ public partial class TournamentHubController : Control
             Control slot = new Control { CustomMinimumSize = new Vector2(24, 24) };
 
             if (miEquipo.StarRating >= i)
-            {
                 slot.AddChild(CrearCapaEstrella(_texEstrellaLlena, Colors.White));
-            }
             else if (miEquipo.StarRating >= i - 0.5f)
             {
                 slot.AddChild(CrearCapaEstrella(_texEstrellaLlena, new Color(0, 0, 0, 0.4f)));
                 slot.AddChild(CrearCapaEstrella(_texEstrellaMedia, Colors.White));
             }
             else
-            {
                 slot.AddChild(CrearCapaEstrella(_texEstrellaLlena, new Color(0, 0, 0, 0.4f)));
-            }
+
             _previewEstrellas.AddChild(slot);
         }
     }
@@ -591,23 +330,174 @@ public partial class TournamentHubController : Control
 
     private void ActualizarPanelPrevia()
     {
-        PartidoFixture proximoPartido = _estado.Calendario.FirstOrDefault(p =>
-            !p.Jugado &&
-            (p.EquipoLocal == _estado.NombreEquipoJugador || p.EquipoVisitante == _estado.NombreEquipoJugador));
+        if (!EstaViendoPresente()) { _panelPrevia.Visible = false; return; }
 
-        if (proximoPartido == null)
+        FaseTorneo fase = _estado.FaseActual;
+        if (fase == null) { _panelPrevia.Visible = false; return; }
+
+        var pendientes = GestorTorneo.ObtenerPartidosPendientes(fase);
+        var proximo = pendientes.FirstOrDefault(p => EsEquipoDelJugador(p.Local) || EsEquipoDelJugador(p.Visitante));
+
+        if (proximo == default)
         {
             _panelPrevia.Visible = false;
             return;
         }
 
         _panelPrevia.Visible = true;
-        _nombresPrevia.Text = $"{proximoPartido.EquipoLocal} vs {proximoPartido.EquipoVisitante}";
+        _nombresPrevia.Text = $"{proximo.Local} vs {proximo.Visitante}";
 
-        TeamData equipoLocal = _equipos.FirstOrDefault(e => e.TeamName == proximoPartido.EquipoLocal);
-        TeamData equipoVisitante = _equipos.FirstOrDefault(e => e.TeamName == proximoPartido.EquipoVisitante);
+        TeamData equipoLocal = _equipos.FirstOrDefault(e => e.TeamName == proximo.Local);
+        TeamData equipoVisitante = _equipos.FirstOrDefault(e => e.TeamName == proximo.Visitante);
 
         _cabezaLocal.Texture = equipoLocal?.CabezaTexture;
         _cabezaVisitante.Texture = equipoVisitante?.CabezaTexture;
+    }
+
+    private void DetectarEliminacionInmediata(FaseTorneo faseDelPartido, int golesJugador, int golesRival)
+    {
+        if (faseDelPartido == null || faseDelPartido.Tipo != TipoFormato.Eliminacion) return;
+        if (golesJugador < golesRival)
+        {
+            _estado.JugadorEliminado = true;
+        }
+    }
+
+    private void DetectarEliminacionPorClasificacion(FaseTorneo faseAntesDeAvanzar)
+    {
+        if (_estado.JugadorEliminado) return;
+        if (faseAntesDeAvanzar == null || !faseAntesDeAvanzar.Completada) return;
+        if (faseAntesDeAvanzar.Tipo == TipoFormato.Eliminacion) return; 
+
+        bool sigueVivo = _estado.FaseActual != null
+            && EquipoEstaEnFase(_estado.NombreEquipoJugador, _estado.FaseActual);
+
+        if (!sigueVivo)
+        {
+            _estado.JugadorEliminado = true;
+        }
+    }
+
+    private bool EquipoEstaEnFase(string equipo, FaseTorneo fase)
+    {
+        return fase.Tipo switch
+        {
+            TipoFormato.RoundRobin => fase.TablaPosiciones.Any(e => e.NombreEquipo == equipo),
+            TipoFormato.Grupos => fase.Grupos.Any(g => g.Equipos.Contains(equipo)),
+            TipoFormato.Eliminacion => fase.Llaves.Any(l => l.EquipoLocal == equipo || l.EquipoVisitante == equipo),
+            _ => false
+        };
+    }
+
+    private bool EstaTorneoFinalizado()
+    {
+        return _estado.FaseActual != null
+            && _estado.FaseActual.Completada
+            && _estado.FaseActualIndice == _estado.Fases.Count - 1;
+    }
+
+    private void SimularRestoDelTorneo()
+    {
+        while (!EstaTorneoFinalizado())
+        {
+            FaseTorneo faseActual = _estado.FaseActual;
+            if (faseActual == null) break; 
+
+            var pendientes = GestorTorneo.ObtenerUnidadPendiente(faseActual);
+
+            if (pendientes.Count == 0)
+            {
+                if (!GestorTorneo.AvanzarFaseSiCorresponde(_estado)) break;
+                continue;
+            }
+
+            foreach (var partido in pendientes)
+            {
+                SimularYRegistrar(partido.Local, partido.Visitante);
+            }
+
+            GestorTorneo.AvanzarFaseSiCorresponde(_estado);
+        }
+
+        GestorGuardado.Instance.GuardarTorneo(_estado);
+        SincronizarDropdownConPresente(); 
+        RedibujarTodo();
+    }
+
+    private void AplicarVisibilidadPestanas(TipoFormato tipo)
+    {
+        bool esEliminacion = tipo == TipoFormato.Eliminacion;
+
+        _pestanas.TabsVisible = !esEliminacion;
+        _pestanas.SetTabTitle(0, esEliminacion ? "Llaves" : "Posiciones");
+        _pestanas.SetTabTitle(1, "Fixture");
+
+        if (esEliminacion)
+        {
+            _pestanas.CurrentTab = 0;
+        }
+    }
+
+    private void DetectarYMostrarRepechaje()
+    {
+        if (_estado.RepechajeMostrado) return;
+        if (_estado.Region != "Oceania") return;
+        if (!EstaTorneoFinalizado()) return;
+
+        FaseTorneo faseFinal = _estado.FaseActual;
+        if (faseFinal == null || faseFinal.Tipo != TipoFormato.Eliminacion) return;
+        if (faseFinal.Llaves.Count == 0) return;
+
+        int rondaMaxima = faseFinal.Llaves.Max(l => l.Ronda);
+        LlaveEliminacion final = faseFinal.Llaves.FirstOrDefault(l => l.Ronda == rondaMaxima);
+        if (final == null || !final.Jugado) return;
+
+        bool jugadorEnLaFinal = EsEquipoDelJugador(final.EquipoLocal) || EsEquipoDelJugador(final.EquipoVisitante);
+        bool jugadorFueSubcampeon = jugadorEnLaFinal && !EsEquipoDelJugador(final.Ganador);
+
+        if (jugadorFueSubcampeon)
+        {
+            _dialogoRepechaje.DialogText = $"{_estado.NombreEquipoJugador} terminó subcampeón de Oceanía.\n" +
+                                            "¡Clasificaste al Repechaje Intercontinental!";
+            _dialogoRepechaje.PopupCentered();
+        }
+
+        _estado.RepechajeMostrado = true;
+        GestorGuardado.Instance.GuardarTorneo(_estado);
+    }
+
+    private FaseTorneo FaseVisualizada =>
+        (_indiceFaseVisualizada >= 0 && _indiceFaseVisualizada < _estado.Fases.Count)
+            ? _estado.Fases[_indiceFaseVisualizada]
+            : null;
+
+    private bool EstaViendoPresente() => _indiceFaseVisualizada == _estado.FaseActualIndice;
+
+    private void PoblarDropdownHistorial()
+    {
+        _dropdownHistorial.Clear();
+
+        int maximoIndice = Mathf.Min(_estado.FaseActualIndice, _estado.Fases.Count - 1);
+
+        for (int i = 0; i <= maximoIndice; i++)
+        {
+            string etiqueta = _estado.Fases[i].Nombre;
+            if (i == _estado.FaseActualIndice) etiqueta += "  (Actual)";
+            _dropdownHistorial.AddItem(etiqueta);
+        }
+
+        _dropdownHistorial.Select(_indiceFaseVisualizada);
+    }
+
+    private void SincronizarDropdownConPresente()
+    {
+        _indiceFaseVisualizada = _estado.FaseActualIndice;
+        PoblarDropdownHistorial();
+    }
+
+    private void OnFaseHistorialSeleccionada(long indice)
+    {
+        _indiceFaseVisualizada = (int)indice;
+        RedibujarTodo();
     }
 }

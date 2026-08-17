@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://bua3xwr2qd0h6"]
 
-[ext_resource type="Script" uid="uid://bjbprb04ivvuu" path="res://scripts/Futbolista.cs" id="1_1l4oc"]
+[ext_resource type="Script" uid="uid://bjbprb04ivvuu" path="res://scripts/Cancha/Futbolista.cs" id="1_1l4oc"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_sesi1"]
 radius = 4.7461357

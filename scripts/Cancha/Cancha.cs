@@ -50,10 +50,9 @@ public partial class Cancha : Node2D
 
     private void ConfigurarEquiposDeTorneo()
     {
-        List<TeamData> equipos = RepositorioEquipos.ObtenerEquiposConmebol();
-
-        TeamData equipoJugador = equipos.FirstOrDefault(e => e.TeamName == PuenteTorneo.Instance.EquipoJugador);
-        TeamData equipoRival = equipos.FirstOrDefault(e => e.TeamName == PuenteTorneo.Instance.EquipoRival);
+        // Usamos el nuevo buscador global que agregamos al Repositorio
+        TeamData equipoJugador = RepositorioEquipos.BuscarEquipo(PuenteTorneo.Instance.EquipoJugador);
+        TeamData equipoRival = RepositorioEquipos.BuscarEquipo(PuenteTorneo.Instance.EquipoRival);
 
         // Polimorfismo: Jugador1 y Rival heredan de Futbolista, por lo que comparten la interfaz de configuración visual.
         (Jugador1 as Futbolista)?.AplicarEquipo(equipoJugador);

@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://cpojvktw5f1f6"]
 
-[ext_resource type="Script" uid="uid://cynw161r7qnnf" path="res://scripts/Cancha.cs" id="1_ilx2b"]
-[ext_resource type="Script" uid="uid://40i6dcq2ekpf" path="res://scripts/Pelota.cs" id="1_yokxi"]
+[ext_resource type="Script" uid="uid://cynw161r7qnnf" path="res://scripts/Cancha/Cancha.cs" id="1_ilx2b"]
+[ext_resource type="Script" uid="uid://40i6dcq2ekpf" path="res://scripts/Cancha/Pelota.cs" id="1_yokxi"]
 [ext_resource type="Texture2D" uid="uid://cu5h6rwxqiefi" path="res://img/fondo_cancha.png" id="2_dvrj7"]
 [ext_resource type="Texture2D" uid="uid://doip45b3rhyhu" path="res://img/trionda_pelota.png" id="2_yokxi"]
 [ext_resource type="AudioStream" uid="uid://bkur7iahd0bcv" path="res://audios/audioRebotePelota.wav" id="3_5c533"]
@@ -11,11 +11,11 @@
 [ext_resource type="Texture2D" uid="uid://cymxwi5dp1qi3" path="res://img/porterias/PorteriaDerecha.png" id="7_8omlu"]
 [ext_resource type="Texture2D" uid="uid://bk1lx8y7k23w" path="res://img/camisetas/conmebol/camiseta_Argentina.png" id="7_dvrj7"]
 [ext_resource type="Texture2D" uid="uid://deyliggv2jdoy" path="res://img/chimpunes/chimpun2.png" id="8_00amt"]
-[ext_resource type="Script" uid="uid://rwlvth0x2u7l" path="res://scripts/Hud.cs" id="8_8omlu"]
+[ext_resource type="Script" uid="uid://rwlvth0x2u7l" path="res://scripts/Cancha/Hud.cs" id="8_8omlu"]
 [ext_resource type="FontFile" uid="uid://bh1bpfcka4ewu" path="res://fonts/Roboto-Black.ttf" id="10_ua78f"]
 [ext_resource type="Texture2D" uid="uid://capsjf5pwjcea" path="res://img/banderas/conmebol/bandera_Peru.png" id="11_rb1qc"]
 [ext_resource type="Texture2D" uid="uid://dooiiailkjclg" path="res://img/banderas/conmebol/bandera_Argentina.png" id="12_d5jh7"]
-[ext_resource type="Script" uid="uid://sfm7ipwvukye" path="res://scripts/FutbolistaIA.cs" id="13_0ue7f"]
+[ext_resource type="Script" uid="uid://sfm7ipwvukye" path="res://scripts/Cancha/FutbolistaIA.cs" id="13_0ue7f"]
 [ext_resource type="Texture2D" uid="uid://bki54b2lt718d" path="res://img/cabezones/conmebol/cabezon_Guerrero_Per.png" id="14_qihi3"]
 [ext_resource type="Texture2D" uid="uid://c78ktic0cglvb" path="res://img/camisetas/conmebol/camiseta_Peru.png" id="15_jwhsl"]
 [ext_resource type="Texture2D" uid="uid://5kgwiqjatn07" path="res://img/chimpunes/chimpun3.png" id="16_8xsb8"]
@@ -233,9 +233,9 @@ texture = ExtResource("17_ql0c1")
 [node name="LabelTiempo" type="Label" parent="HUD/FondoMarcador" unique_id=368713716]
 modulate = Color(0, 0, 0, 1)
 layout_mode = 0
-offset_left = 28.0
+offset_left = 8.0
 offset_top = 24.0
-offset_right = 122.0
+offset_right = 140.0
 offset_bottom = 62.0
 theme_override_fonts/font = ExtResource("10_ua78f")
 theme_override_font_sizes/font_size = 29

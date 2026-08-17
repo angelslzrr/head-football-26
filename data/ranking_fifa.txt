@@ -1,0 +1,211 @@
+1. argentina
+2. españa
+3. francia
+4. inglaterra
+5. portugal
+6. brasil
+7. marruecos
+8. países bajos
+9. belgica
+10. alemania
+11. Croacia
+12. Italia
+13. Colombia
+14. mexico
+15. Senegal
+16. Uruguay
+17. eeuu
+18. japon
+19. suiza
+20. iran
+21. Dinamarca
+22. turquia
+23. ecuador
+24. Austria
+25. corea del sur
+26. Nigeria
+27. Australia
+28. Argelia
+29. Egipto
+30. canada
+31. noruega
+32. ucrania
+33. costa de marfil
+34. panama
+35. rusia
+36. Polonia
+37. gales
+38. Suecia
+39. hungria
+40. republica checa
+41. Paraguay
+42. escocia
+43. serbia
+44. camerun
+45. tunez
+46. rd Congo
+47. Eslovaquia
+48. Grecia
+49. Venezuela
+50. uzbekistan
+51. chile
+52. peru
+53. costa rica
+54. Rumania
+55. mali
+56. qatar
+57. Irak
+58. republica de irlanda
+59. Eslovenia
+60. sudafrica
+61. arabia saudita
+62. burkina faso
+63. Jordania
+64. bosnia y Herzegovina
+65. honduras
+66. Albania
+67. cabo verde
+68. emiratos árabes unidos
+69. macedonia del norte
+70. irlanda del norte
+71. Jamaica
+72. Georgia
+73. ghana
+74. Islandia
+75. Finlandia
+76. Israel
+77. Bolivia
+78. Kosovo
+79. oman
+80. montenegro
+81. guinea
+82. curazao
+83. haiti
+84. siria
+85. nueva Zelanda
+86. gabon
+87. Bulgaria
+88. angola
+89. Uganda
+90. zambia
+91. rp china
+92. bahrein
+93. benin
+94. Tailandia
+95. palestina
+96. Bielorrusia
+97. Guatemala
+98. Luxemburgo
+99. vietnam
+100. el salvador
+101. tayikistan
+102. trinidad y Tobago
+103. mozambique
+104. Madagascar
+105. guinea ecuatorial
+106. kirguistan
+107. armenia
+108. Comoras
+109. Kenia
+110. libia
+111. kazajistan
+112. Tanzania
+113. Mauritania
+114. niger
+115. libano
+116. Gambia
+117. sudan
+118. indonesia
+119. togo
+120. corea del norte
+121. namibia
+122. sierra leona
+123. islas feroe
+124. Chipre
+125. Surinam
+126. azerbaiyan
+127. estonia
+128. Ruanda
+129. malaui
+130. Zimbabue
+131. nicaragua
+132. guinea-bisau
+133. Kuwait
+134. Congo
+135. filipinas
+136. malasia
+137. letonia
+138. india
+139. republica centroafricana
+140. Liberia
+141. turkmenistan
+142. Burundi
+143. etiopia
+144. republica dominicana
+145. Yemen
+146. Lesoto
+147. botsuana
+148. singapur
+149. lituania
+150. Guyana
+151. nueva caledonia
+152. san cristobal y nieves
+153. islas salomon
+154. puerto rico
+155. Fiyi
+156. hong Kong
+157. tahiti
+158. Myanmar
+159. Moldavia
+160. Vanuatu
+161. malta
+162. antigua y barbuda
+163. granada
+164. cuba
+165. Suazilandia
+166. santa lucia
+167. bermuda
+168. papua nueva guinea
+169. sudan del sur
+170. san Vicente y las granadinas
+171. afganistan
+172. andorra
+173. maldivas
+174. china taipei
+175. Camboya
+176. Montserrat
+177. Nepal
+178. mauricio
+179. barbados
+180. Belice
+181. bangladesh
+182. dominica
+183. Chad
+184. eritrea
+185. laos
+186. islas cook
+187. sri Lanka
+188. Samoa
+189. Aruba
+190. Mongolia
+191. Samoa americana
+192. butan
+193. macao
+194. brunei darusalam
+195. santo tome y príncipe
+196. yibuti
+197. islas caiman
+198. pakistan
+199. Somalia
+200. tonga
+201. timor oriental
+202. Gibraltar
+203. Guam
+204. Seychelles
+205. islas turcas y caicos
+206. Liechtenstein
+207. Bahamas
+208. islas virgenes estadounidenses
+209. islas virgenes británicas
+210. anguila
+211. san marino

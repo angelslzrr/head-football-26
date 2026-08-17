@@ -1,11 +1,6 @@
 using Godot;
 using System.Linq;
 
-/// <summary>
-/// Capa CanvasLayer de interfaz de usuario renderizada sobre la simulación física (Cancha).
-/// Utiliza datos inyectados de PuenteTorneo para mostrar las iniciales y banderas oficiales de FIFA.
-/// Interviene en el paso de estado del partido (finalización por temporizador).
-/// </summary>
 public partial class Hud : CanvasLayer
 {
     [Export] public int DuracionPartidoSegundos = 45;
@@ -17,6 +12,8 @@ public partial class Hud : CanvasLayer
     private int _tiempoRestante;
 
     private AudioStreamPlayer _silbatoFinal;
+
+    private bool _enGolDeOro = false;
 
     public override void _Ready()
     {
@@ -40,8 +37,8 @@ public partial class Hud : CanvasLayer
         _silbatoFinal = GetNode<AudioStreamPlayer>("SilbatoFinal");
 
         _tiempoRestante = DuracionPartidoSegundos;
+        _enGolDeOro = false;
 
-        // Suscripción al bus de eventos de la instancia GameManager.
         GameManager.Instance.GolAnotado += OnGolAnotado;
         _timerPartido.Timeout += OnSegundoPasado;
 
@@ -54,7 +51,6 @@ public partial class Hud : CanvasLayer
         ActualizarTiempo();
     }
 
-    // Patrón de limpieza de memoria: elimina listeners huérfanos para evitar fugas y excepciones.
     public override void _ExitTree()
     {
         if (GameManager.Instance != null)
@@ -65,9 +61,8 @@ public partial class Hud : CanvasLayer
 
     private void ConfigurarDatosTorneo()
     {
-        var equipos = RepositorioEquipos.ObtenerEquiposConmebol();
-        var equipoJugador = equipos.FirstOrDefault(e => e.TeamName == PuenteTorneo.Instance.EquipoJugador);
-        var equipoRival = equipos.FirstOrDefault(e => e.TeamName == PuenteTorneo.Instance.EquipoRival);
+        var equipoJugador = RepositorioEquipos.BuscarEquipo(PuenteTorneo.Instance.EquipoJugador);
+        var equipoRival = RepositorioEquipos.BuscarEquipo(PuenteTorneo.Instance.EquipoRival);
 
         if (equipoRival != null)
         {
@@ -82,20 +77,51 @@ public partial class Hud : CanvasLayer
         }
     }
 
-    private void OnGolAnotado(int equipo)
+    private async void OnGolAnotado(int equipo)
     {
         ActualizarMarcador();
+
+        if (!_enGolDeOro) return;
+
+        GameManager.Instance.PartidoTerminado = true;
+        _silbatoFinal.Play();
+
+        GD.Print("¡GOL DE ORO! Partido decidido en muerte súbita.");
+
+        if (PuenteTorneo.Instance.PartidoDeTorneo)
+        {
+            await ToSignal(GetTree().CreateTimer(4f), SceneTreeTimer.SignalName.Timeout);
+
+            PuenteTorneo.Instance.GuardarResultado(
+                GameManager.Instance.GolesEquipo2,
+                GameManager.Instance.GolesEquipo1
+            );
+
+            GetTree().ChangeSceneToFile("res://escenas/UI/TournamentHub.tscn");
+        }
     }
 
     private async void OnSegundoPasado()
     {
         if (GameManager.Instance.PartidoTerminado) return;
+        if (_enGolDeOro) return; 
 
         _tiempoRestante--;
         ActualizarTiempo();
 
         if (_tiempoRestante <= 0)
         {
+            bool hayEmpate = GameManager.Instance.GolesEquipo1 == GameManager.Instance.GolesEquipo2;
+            bool aplicaGolDeOro = PuenteTorneo.Instance.PartidoDeTorneo
+                && PuenteTorneo.Instance.EsFaseEliminacion
+                && hayEmpate;
+
+            if (aplicaGolDeOro)
+            {
+                IniciarGolDeOro();
+                return;
+            }
+
             _timerPartido.Stop();
             GameManager.Instance.PartidoTerminado = true;
 
@@ -113,6 +139,19 @@ public partial class Hud : CanvasLayer
                 
                 GetTree().ChangeSceneToFile("res://escenas/UI/TournamentHub.tscn");
             }
+        }
+    }
+
+    private void IniciarGolDeOro()
+    {
+        _enGolDeOro = true;
+        _timerPartido.Stop();
+
+        _labelTiempo.Text = "GOL DE ORO";
+
+        if (_labelTiempo.LabelSettings != null)
+        {
+            _labelTiempo.LabelSettings.FontSize = 20;
         }
     }
 

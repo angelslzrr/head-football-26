@@ -79,7 +79,10 @@ public partial class MainMenuController : Control
             TournamentState estado = GestorGuardado.Instance.CargarTorneo();
             if (estado != null)
             {
-                _labelInfoPartida.Text = $"{estado.NombreEquipoJugador} — Jornada {estado.JornadaActual}";
+                // Obtenemos el nombre de la fase actual para que sirva en cualquier confederación
+                string textoFase = estado.FaseActual != null ? estado.FaseActual.Nombre : "Torneo Finalizado";
+                
+                _labelInfoPartida.Text = $"{estado.NombreEquipoJugador} — {textoFase}";
                 _overlayPartidaEnCurso.Visible = true;
                 return; 
             }

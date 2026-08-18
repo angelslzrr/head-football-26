@@ -1,4 +1,5 @@
 using Godot;
+using System.Collections.Generic;
 using System.Linq;
 
 public partial class TournamentHubController : Control
@@ -23,6 +24,7 @@ public partial class TournamentHubController : Control
     private Label _mensajePartidoJugador;
     private Button _btnSimularJornada;
     private Button _btnVolver;
+    private Button _btnVerMundo;
 
     private Control _panelPrevia;
     private TextureRect _cabezaLocal;
@@ -30,7 +32,7 @@ public partial class TournamentHubController : Control
     private Label _nombresPrevia;
 
     private TournamentState _estado;
-    private System.Collections.Generic.List<TeamData> _equipos;
+    private List<TeamData> _equipos;
     private IRenderizadorFase _renderizadorActual;
 
     private TabContainer _pestanas;
@@ -71,9 +73,11 @@ public partial class TournamentHubController : Control
         _mensajePartidoJugador = GetNode<Label>("Layout/MensajePartidoJugador");
         _btnSimularJornada = GetNode<Button>("Layout/BarraInferior/BtnSimularJornada");
         _btnVolver = GetNode<Button>("Layout/BarraInferior/BtnVolver");
-
+        _btnVerMundo = GetNode<Button>("Layout/BarraInferior/BtnVerMundo");
+        
         _btnSimularJornada.Pressed += AvanzarSimulacion;
         _btnVolver.Pressed += () => GetTree().ChangeSceneToFile(RutaMainMenu);
+        _btnVerMundo.Pressed += () => GetTree().ChangeSceneToFile("res://escenas/UI/GlobalHub.tscn");
 
         _estado = GestorGuardado.Instance.CargarTorneo();
         if (_estado == null)
@@ -120,9 +124,7 @@ public partial class TournamentHubController : Control
 
         GestorTorneo.ProcesarResultado(_estado, local, visitante, golesLocal, golesVisitante);
 
-        int golesJugador = jugadorEsLocal ? golesLocal : golesVisitante;
-        int golesRival = jugadorEsLocal ? golesVisitante : golesLocal;
-        DetectarEliminacionInmediata(faseDelPartido, golesJugador, golesRival);
+        DetectarEliminacionInmediata(faseDelPartido);
 
         GestorTorneo.AvanzarFaseSiCorresponde(_estado);
         DetectarEliminacionPorClasificacion(faseDelPartido);
@@ -157,6 +159,8 @@ public partial class TournamentHubController : Control
         ActualizarInterfazFase();
         ActualizarPanelPrevia();
         DetectarYMostrarRepechaje();
+        SimularMundoSiCorresponde();
+        _btnVerMundo.Visible = _estado.MundoSimulado;
     }
 
     private void ActualizarInterfazFase()
@@ -239,7 +243,30 @@ public partial class TournamentHubController : Control
             GestorGuardado.Instance.GuardarTorneo(_estado);
 
             bool esEliminacion = fase.Tipo == TipoFormato.Eliminacion;
-            PuenteTorneo.Instance.IniciarPartidoDeTorneo(_estado.NombreEquipoJugador, rival, jugadorEsLocal, esEliminacion);
+            bool esPartidoDeVuelta = false;
+            int golesGlobalJugador = 0;
+            int golesGlobalRival = 0;
+
+            if (esEliminacion)
+            {
+                LlaveEliminacion llaveJugador = fase.Llaves.FirstOrDefault(l =>
+                    !l.Jugado &&
+                    ((l.EquipoLocal == _estado.NombreEquipoJugador && l.EquipoVisitante == rival) ||
+                     (l.EquipoLocal == rival && l.EquipoVisitante == _estado.NombreEquipoJugador)));
+
+                if (llaveJugador != null && llaveJugador.IdaYVuelta && llaveJugador.JugadoIda)
+                {
+                    esPartidoDeVuelta = true;
+                    bool jugadorEsLocalOriginal = llaveJugador.EquipoLocal == _estado.NombreEquipoJugador;
+                    golesGlobalJugador = jugadorEsLocalOriginal ? llaveJugador.GolesGlobalLocal : llaveJugador.GolesGlobalVisitante;
+                    golesGlobalRival = jugadorEsLocalOriginal ? llaveJugador.GolesGlobalVisitante : llaveJugador.GolesGlobalLocal;
+                }
+            }
+
+            PuenteTorneo.Instance.IniciarPartidoDeTorneo(
+                _estado.NombreEquipoJugador, rival, jugadorEsLocal, esEliminacion,
+                esPartidoDeVuelta, golesGlobalJugador, golesGlobalRival);
+
             GetTree().ChangeSceneToFile(RutaCancha);
             return;
         }
@@ -261,11 +288,6 @@ public partial class TournamentHubController : Control
         float estrellasLocal = ObtenerEstrellas(local);
         float estrellasVisitante = ObtenerEstrellas(visitante);
         (int golesLocal, int golesVisitante) = SimulationEngine.SimularPartido(estrellasLocal, estrellasVisitante);
-
-        if (_estado.FaseActual.Tipo == TipoFormato.Eliminacion)
-        {
-            (golesLocal, golesVisitante) = SimulationEngine.ResolverEmpateSiCorresponde(local, visitante, golesLocal, golesVisitante);
-        }
 
         GestorTorneo.ProcesarResultado(_estado, local, visitante, golesLocal, golesVisitante);
     }
@@ -354,10 +376,16 @@ public partial class TournamentHubController : Control
         _cabezaVisitante.Texture = equipoVisitante?.CabezaTexture;
     }
 
-    private void DetectarEliminacionInmediata(FaseTorneo faseDelPartido, int golesJugador, int golesRival)
+    private void DetectarEliminacionInmediata(FaseTorneo faseDelPartido)
     {
         if (faseDelPartido == null || faseDelPartido.Tipo != TipoFormato.Eliminacion) return;
-        if (golesJugador < golesRival)
+
+        LlaveEliminacion llaveDelJugador = faseDelPartido.Llaves.FirstOrDefault(l =>
+            l.EquipoLocal == _estado.NombreEquipoJugador || l.EquipoVisitante == _estado.NombreEquipoJugador);
+
+        if (llaveDelJugador == null || !llaveDelJugador.Jugado) return; // Si falta la vuelta, sigue vivo
+
+        if (llaveDelJugador.Ganador != _estado.NombreEquipoJugador)
         {
             _estado.JugadorEliminado = true;
         }
@@ -499,5 +527,34 @@ public partial class TournamentHubController : Control
     {
         _indiceFaseVisualizada = (int)indice;
         RedibujarTodo();
+    }
+
+    private void SimularMundoSiCorresponde()
+    {
+        if (_estado.MundoSimulado) return;
+        if (!EstaTorneoFinalizado()) return;
+
+        // Alcance MVP: solo Conmebol <-> OFC
+        string regionRestante = _estado.Region == "Sudamérica" ? "Oceania" : "Sudamérica";
+
+        List<FaseTorneo> fasesRestoDelMundo = RepositorioFormatos.ObtenerFormatoPorRegion(regionRestante);
+        List<TeamData> equiposRestoDelMundo = RepositorioEquipos.ObtenerEquiposPorRegion(regionRestante);
+        List<string> nombresRestoDelMundo = equiposRestoDelMundo.Select(e => e.TeamName).ToList();
+
+        // Estado descartable para reutilizar el motor
+        var estadoTemporal = new TournamentState();
+        GestorTorneo.IniciarTorneo(estadoTemporal, fasesRestoDelMundo, nombresRestoDelMundo);
+        GestorTorneo.SimularTorneoCompleto(estadoTemporal, equiposRestoDelMundo);
+
+        _estado.RestoDelMundo.Add(new EliminatoriaRegion
+        {
+            Region = regionRestante,
+            Fases = estadoTemporal.Fases
+        });
+
+        _estado.MundoSimulado = true;
+        GestorGuardado.Instance.GuardarTorneo(_estado);
+        
+        GD.Print($"🌍 ¡Macro-simulación completada! Se simuló toda la región de: {regionRestante}");
     }
 }

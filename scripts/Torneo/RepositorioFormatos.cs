@@ -42,12 +42,45 @@ public static class RepositorioFormatos
         };
     }
 
+    public static List<FaseTorneo> ObtenerFormatoCONCACAF()
+    {
+        return new List<FaseTorneo>
+        {
+            new FaseTorneo
+            {
+                Nombre = "Ronda 1 — Play-in",
+                Tipo = TipoFormato.Eliminacion,
+                SorteoAleatorio = true,
+                RondaUnica = true,
+                LlavesIdaYVuelta = true,
+                EquiposParticipantesIniciales = 4,
+                ClasificanASiguienteFase = -1
+            },
+            new FaseTorneo
+            {
+                Nombre = "Ronda 2 — Fase de Grupos",
+                Tipo = TipoFormato.Grupos,
+                EquiposPorGrupo = 5,
+                ClasificanASiguienteFase = -1
+            },
+            new FaseTorneo
+            {
+                Nombre = "Ronda 3 — Fase Final",
+                Tipo = TipoFormato.Grupos,
+                EquiposPorGrupo = 4,
+                IdaYVuelta = true, // Aquí activamos la doble vuelta universal
+                ClasificanASiguienteFase = -1 
+            }
+        };
+    }
+
     public static List<FaseTorneo> ObtenerFormatoPorRegion(string region)
     {
         return region switch
         {
             "Sudamérica" => ObtenerFormatoCONMEBOL(),
             "Oceania" => ObtenerFormatoOFC(),
+            "Norte y Centroamérica" => ObtenerFormatoCONCACAF(),
             _ => new List<FaseTorneo>()
         };
     }

@@ -13,7 +13,10 @@ public class FaseTorneo
     // --- Parámetros de reglas ---
     public int ClasificanPorGrupo { get; set; } = 2;   
     public int EquiposPorGrupo { get; set; } = 4;       
-    public bool SorteoAleatorio { get; set; } = true;   
+    public bool SorteoAleatorio { get; set; } = true;
+    public bool RondaUnica { get; set; } = false;
+    public bool IdaYVuelta { get; set; } = false;
+    public bool LlavesIdaYVuelta { get; set; } = false;
 
     // Equipos que entran DIRECTAMENTE a esta fase.
     public List<string> EquiposDirectos { get; set; } = new();

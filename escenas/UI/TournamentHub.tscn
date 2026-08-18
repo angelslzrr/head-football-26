@@ -216,6 +216,11 @@ custom_minimum_size = Vector2(200, 50)
 layout_mode = 2
 text = "Simular partido"
 
+[node name="BtnVerMundo" type="Button" parent="Layout/BarraInferior" unique_id=2063190514]
+custom_minimum_size = Vector2(200, 50)
+layout_mode = 2
+text = "Ver resto del mundo"
+
 [node name="DialogoRepechaje" type="AcceptDialog" parent="." unique_id=482877464]
 title = "¡Felicidades!"
 ok_button_text = "Entendido"

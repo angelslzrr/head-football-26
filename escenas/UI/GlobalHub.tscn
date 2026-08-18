@@ -1,0 +1,105 @@
+[gd_scene format=3 uid="uid://csv5sbo382e53"]
+
+[ext_resource type="Texture2D" uid="uid://b4lnx0iconofd" path="res://img/Fondo_Menus.png" id="1_44lj5"]
+[ext_resource type="Script" uid="uid://bul3ym44t6kr3" path="res://scripts/UI/GlobalHubController.cs" id="1_wfjxc"]
+
+[node name="GlobalHub" type="Control" unique_id=372778069]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_wfjxc")
+
+[node name="Fondo" type="TextureRect" parent="." unique_id=1355847369]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("1_44lj5")
+
+[node name="Layout" type="VBoxContainer" parent="." unique_id=1494083208]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 10
+
+[node name="Titulo" type="Label" parent="Layout" unique_id=799804076]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.87058824, 0.7294118, 0, 1)
+theme_override_font_sizes/font_size = 24
+text = "Resto del Mundo"
+horizontal_alignment = 1
+
+[node name="ContenidoPrincipal" type="HBoxContainer" parent="Layout" unique_id=1700897988]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 15
+
+[node name="PanelIzquierdo" type="VBoxContainer" parent="Layout/ContenidoPrincipal" unique_id=1167613617]
+custom_minimum_size = Vector2(180, 0)
+layout_mode = 2
+theme_override_constants/separation = 16
+alignment = 1
+
+[node name="PanelDerecho" type="VBoxContainer" parent="Layout/ContenidoPrincipal" unique_id=971260586]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="DropdownFases" type="OptionButton" parent="Layout/ContenidoPrincipal/PanelDerecho" unique_id=1030636976]
+custom_minimum_size = Vector2(280, 0)
+layout_mode = 2
+
+[node name="Pestanas" type="TabContainer" parent="Layout/ContenidoPrincipal/PanelDerecho" unique_id=1806533325]
+layout_mode = 2
+size_flags_vertical = 3
+current_tab = 0
+
+[node name="Posiciones" type="VBoxContainer" parent="Layout/ContenidoPrincipal/PanelDerecho/Pestanas" unique_id=1126498385]
+layout_mode = 2
+metadata/_tab_index = 0
+
+[node name="FondoTabla" type="PanelContainer" parent="Layout/ContenidoPrincipal/PanelDerecho/Pestanas/Posiciones" unique_id=1691187396]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ScrollPosiciones" type="ScrollContainer" parent="Layout/ContenidoPrincipal/PanelDerecho/Pestanas/Posiciones/FondoTabla" unique_id=707903676]
+layout_mode = 2
+
+[node name="ContenedorDinamicoPosiciones" type="VBoxContainer" parent="Layout/ContenidoPrincipal/PanelDerecho/Pestanas/Posiciones/FondoTabla/ScrollPosiciones" unique_id=839076811]
+layout_mode = 2
+size_flags_horizontal = 6
+size_flags_vertical = 6
+
+[node name="Fixture" type="VBoxContainer" parent="Layout/ContenidoPrincipal/PanelDerecho/Pestanas" unique_id=940968944]
+visible = false
+layout_mode = 2
+metadata/_tab_index = 1
+
+[node name="FondoFixture" type="PanelContainer" parent="Layout/ContenidoPrincipal/PanelDerecho/Pestanas/Fixture" unique_id=1109233694]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ScrollFixture" type="ScrollContainer" parent="Layout/ContenidoPrincipal/PanelDerecho/Pestanas/Fixture/FondoFixture" unique_id=2112057138]
+layout_mode = 2
+
+[node name="ListaFixture" type="VBoxContainer" parent="Layout/ContenidoPrincipal/PanelDerecho/Pestanas/Fixture/FondoFixture/ScrollFixture" unique_id=1846329530]
+layout_mode = 2
+size_flags_horizontal = 6
+size_flags_vertical = 6
+
+[node name="BarraInferior" type="HBoxContainer" parent="Layout" unique_id=1177985485]
+layout_mode = 2
+alignment = 1
+
+[node name="BtnVolver" type="Button" parent="Layout/BarraInferior" unique_id=567679195]
+custom_minimum_size = Vector2(200, 50)
+layout_mode = 2
+text = "Volver"

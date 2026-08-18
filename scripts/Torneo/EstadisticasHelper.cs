@@ -32,13 +32,17 @@ public static class EstadisticasHelper
         }
     }
 
-    public static List<string> OrdenarTabla(List<EstadisticasEquipoGuardado> tabla)
+    public static List<EstadisticasEquipoGuardado> OrdenarPorCriterioFifa(List<EstadisticasEquipoGuardado> equipos)
     {
-        return tabla
+        return equipos
             .OrderByDescending(e => e.Puntos)
             .ThenByDescending(e => e.DiferenciaGoles)
             .ThenByDescending(e => e.GolesFavor)
-            .Select(e => e.NombreEquipo)
             .ToList();
+    }
+
+    public static List<string> OrdenarTabla(List<EstadisticasEquipoGuardado> tabla)
+    {
+        return OrdenarPorCriterioFifa(tabla).Select(e => e.NombreEquipo).ToList();
     }
 }

@@ -10,7 +10,7 @@ public partial class GestorGuardado : Node
     // Única fuente de verdad sobre qué versión de esquema entiende el juego
     // actual. Si en el futuro volvemos a cambiar TournamentState, alcanza
     // con subir este número — no hace falta tocar la lógica de abajo.
-    private const int VersionActual = 2;
+    private const int VersionActual = 3;
 
     public override void _Ready()
     {

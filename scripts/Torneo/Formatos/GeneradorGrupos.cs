@@ -30,7 +30,11 @@ public class GeneradorGrupos : IGeneradorFormato
 
         foreach (GrupoTorneo grupo in grupos)
         {
-            grupo.Calendario = GeneradorFixture.GenerarRondasUnaVuelta(grupo.Equipos);
+            // Si la fase dice IdaYVuelta, usamos el generador doble. Si no, el simple.
+            grupo.Calendario = fase.IdaYVuelta
+                ? GeneradorFixture.GenerarFixtureIdaYVuelta(grupo.Equipos)
+                : GeneradorFixture.GenerarRondasUnaVuelta(grupo.Equipos);
+
             grupo.TablaPosiciones = grupo.Equipos
                 .Select(nombre => new EstadisticasEquipoGuardado { NombreEquipo = nombre })
                 .ToList();
@@ -72,5 +76,29 @@ public class GeneradorGrupos : IGeneradorFormato
 
         primeros.AddRange(segundos);
         return primeros;
+    }
+
+    /// <summary>
+    /// Separa a los clasificados en dos listas: los líderes (directos) y los mejores segundos (repechaje).
+    /// </summary>
+    public (List<string> Directos, List<string> MejoresSegundos) ObtenerClasificadosConRepechaje(FaseTorneo fase, int cantidadMejoresSegundos)
+    {
+        var campeones = new List<string>();
+        var subcampeones = new List<EstadisticasEquipoGuardado>();
+
+        foreach (GrupoTorneo grupo in fase.Grupos)
+        {
+            List<EstadisticasEquipoGuardado> tablaOrdenada = EstadisticasHelper.OrdenarPorCriterioFifa(grupo.TablaPosiciones);
+            if (tablaOrdenada.Count > 0) campeones.Add(tablaOrdenada[0].NombreEquipo);
+            if (tablaOrdenada.Count > 1) subcampeones.Add(tablaOrdenada[1]);
+        }
+
+        List<string> mejoresSegundos = EstadisticasHelper
+            .OrdenarPorCriterioFifa(subcampeones)
+            .Take(cantidadMejoresSegundos)
+            .Select(e => e.NombreEquipo)
+            .ToList();
+
+        return (campeones, mejoresSegundos);
     }
 }

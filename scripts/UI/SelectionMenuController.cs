@@ -82,8 +82,8 @@ public partial class SelectionMenuController : Control
         {
             Button carta = new Button
             {
-                CustomMinimumSize = new Vector2(220, 60),
-                PivotOffset = new Vector2(110, 30)
+                CustomMinimumSize = new Vector2(300, 70),
+                PivotOffset = new Vector2(150, 35)
             };
 
             HBoxContainer hbox = new HBoxContainer
@@ -102,7 +102,7 @@ public partial class SelectionMenuController : Control
                     CustomMinimumSize = new Vector2(60, 40),
                     ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize,
                     StretchMode = TextureRect.StretchModeEnum.KeepAspectCentered,
-                    MouseFilter = Control.MouseFilterEnum.Ignore
+                    MouseFilter = Control.MouseFilterEnum.Ignore,
                 };
                 hbox.AddChild(bandera);
             }
@@ -111,7 +111,11 @@ public partial class SelectionMenuController : Control
             {
                 Text = equipo.TeamName,
                 VerticalAlignment = VerticalAlignment.Center,
-                MouseFilter = Control.MouseFilterEnum.Ignore
+                MouseFilter = Control.MouseFilterEnum.Ignore,
+                AutowrapMode = TextServer.AutowrapMode.WordSmart,
+                SizeFlagsHorizontal = Control.SizeFlags.ShrinkCenter,
+                CustomMinimumSize = new Vector2(170, 0),
+                HorizontalAlignment = HorizontalAlignment.Center
             };
             hbox.AddChild(texto);
 

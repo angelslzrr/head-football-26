@@ -79,10 +79,13 @@ public static class GestorTorneo
                 break;
 
             case TipoFormato.Eliminacion:
-                pendientes.AddRange(fase.Llaves
-                    .Where(l => !l.Jugado)
-                    .Select(l => (l.EquipoLocal, l.EquipoVisitante)));
-                break;
+            foreach (LlaveEliminacion l in fase.Llaves.Where(l => !l.Jugado))
+            {
+                pendientes.Add((!l.IdaYVuelta || !l.JugadoIda)
+                    ? (l.EquipoLocal, l.EquipoVisitante)     // ida
+                    : (l.EquipoVisitante, l.EquipoLocal));   // vuelta: roles invertidos
+            }
+            break;
         }
 
         return pendientes;
@@ -109,7 +112,15 @@ public static class GestorTorneo
 
         if (siguienteIndice >= estado.Fases.Count)
         {
-            GD.Print($"🏆 Torneo finalizado. Campeón: {(clasificados.Count > 0 ? clasificados[0] : "???")}");
+            if (faseActual.Tipo == TipoFormato.Eliminacion && clasificados.Count > 0)
+            {
+                GD.Print($"🏆 Torneo finalizado. Campeón: {clasificados[0]}");
+            }
+            else
+            {
+                string listado = clasificados.Count > 0 ? string.Join(", ", clasificados) : "(sin clasificados)";
+                GD.Print($"🏁 Torneo finalizado. Clasificados: {listado}");
+            }
             return true; 
         }
 
@@ -174,10 +185,57 @@ public static class GestorTorneo
                 if (pendientes.Count == 0) return new();
                 int minRonda = pendientes.Min(l => l.Ronda);
                 return pendientes.Where(l => l.Ronda == minRonda)
-                    .Select(l => (l.EquipoLocal, l.EquipoVisitante)).ToList();
+                    .Select(l => (!l.IdaYVuelta || !l.JugadoIda) ? (l.EquipoLocal, l.EquipoVisitante) : (l.EquipoVisitante, l.EquipoLocal))
+                    .ToList();
             }
             default:
                 return new();
+        }
+    }
+
+    public static float ObtenerEstrellas(List<TeamData> equipos, string nombreEquipo)
+    {
+        TeamData equipo = equipos.FirstOrDefault(e => e.TeamName == nombreEquipo);
+        return equipo?.StarRating ?? 3.0f;
+    }
+
+    public static void SimularYRegistrarPartido(TournamentState estado, string local, string visitante, List<TeamData> equipos)
+    {
+        float estrellasLocal = ObtenerEstrellas(equipos, local);
+        float estrellasVisitante = ObtenerEstrellas(equipos, visitante);
+        (int golesLocal, int golesVisitante) = SimulationEngine.SimularPartido(estrellasLocal, estrellasVisitante);
+
+        ProcesarResultado(estado, local, visitante, golesLocal, golesVisitante);
+    }
+
+    public static bool TorneoFinalizado(TournamentState estado)
+    {
+        return estado.FaseActual != null
+            && estado.FaseActual.Completada
+            && estado.FaseActualIndice == estado.Fases.Count - 1;
+    }
+
+    public static void SimularTorneoCompleto(TournamentState estado, List<TeamData> equipos)
+    {
+        while (!TorneoFinalizado(estado))
+        {
+            FaseTorneo faseActual = estado.FaseActual;
+            if (faseActual == null) break;
+
+            var pendientes = ObtenerUnidadPendiente(faseActual);
+
+            if (pendientes.Count == 0)
+            {
+                if (!AvanzarFaseSiCorresponde(estado)) break;
+                continue;
+            }
+
+            foreach (var partido in pendientes)
+            {
+                SimularYRegistrarPartido(estado, partido.Local, partido.Visitante, equipos);
+            }
+
+            AvanzarFaseSiCorresponde(estado);
         }
     }
 }

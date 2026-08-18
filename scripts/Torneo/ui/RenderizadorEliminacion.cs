@@ -7,6 +7,7 @@ public class RenderizadorEliminacion : IRenderizadorFase
     public bool OcultaPanelDetalleEquipo => true;
 
     private const int AnchoCaja = 260;
+    private const int AnchoCajaIdaYVuelta = 340;
     private const int AltoCaja = 60;
     private const int SeparacionBase = 16;
 
@@ -28,7 +29,10 @@ public class RenderizadorEliminacion : IRenderizadorFase
                 .OrderBy(l => l.Posicion)
                 .ToList();
 
-            var columna = new VBoxContainer { CustomMinimumSize = new Vector2(AnchoCaja, 0) };
+            bool esIdaYVuelta = llavesRonda.Count > 0 && llavesRonda[0].IdaYVuelta;
+            int anchoUsado = esIdaYVuelta ? AnchoCajaIdaYVuelta : AnchoCaja;
+
+            var columna = new VBoxContainer { CustomMinimumSize = new Vector2(anchoUsado, 0) };
 
             float separacion = SeparacionBase * Mathf.Pow(2, ronda - 1);
             columna.AddThemeConstantOverride("separation", (int)separacion);
@@ -46,7 +50,7 @@ public class RenderizadorEliminacion : IRenderizadorFase
                 columna.AddChild(new Control { CustomMinimumSize = new Vector2(0, separacion / 2f) });
 
             foreach (LlaveEliminacion llave in llavesRonda)
-                columna.AddChild(CrearCajaLlave(llave, nombreEquipoJugador));
+                columna.AddChild(CrearCajaLlave(llave, anchoUsado, nombreEquipoJugador));
 
             filas.AddChild(columna);
         }
@@ -63,7 +67,7 @@ public class RenderizadorEliminacion : IRenderizadorFase
         };
     }
 
-    private Control CrearCajaLlave(LlaveEliminacion llave, string nombreEquipoJugador)
+    private Control CrearCajaLlave(LlaveEliminacion llave, int ancho, string nombreEquipoJugador)
     {
         bool esPartidoJugador = llave.EquipoLocal == nombreEquipoJugador || llave.EquipoVisitante == nombreEquipoJugador;
 
@@ -85,20 +89,24 @@ public class RenderizadorEliminacion : IRenderizadorFase
             estilo.BorderWidthLeft = 3;
         }
 
-        var panel = new PanelContainer { CustomMinimumSize = new Vector2(AnchoCaja, AltoCaja) };
+        var panel = new PanelContainer { CustomMinimumSize = new Vector2(ancho, AltoCaja) };
         panel.AddThemeStyleboxOverride("panel", estilo);
 
         var caja = new VBoxContainer();
-        caja.AddChild(CrearFilaEquipo(llave.EquipoLocal, llave.Jugado ? llave.GolesLocal.ToString() : "", llave.Ganador == llave.EquipoLocal));
-        caja.AddChild(CrearFilaEquipo(llave.EquipoVisitante, llave.Jugado ? llave.GolesVisitante.ToString() : "", llave.Ganador == llave.EquipoVisitante));
+        caja.AddChild(CrearFilaEquipo(llave, esLocal: true));
+        caja.AddChild(CrearFilaEquipo(llave, esLocal: false));
 
         panel.AddChild(caja);
         return panel;
     }
 
-    private Control CrearFilaEquipo(string nombreEquipo, string goles, bool esGanador)
+    private Control CrearFilaEquipo(LlaveEliminacion llave, bool esLocal)
     {
+        string nombreEquipo = esLocal ? llave.EquipoLocal : llave.EquipoVisitante;
+        bool esGanador = !string.IsNullOrEmpty(llave.Ganador) && llave.Ganador == nombreEquipo;
+
         var fila = new HBoxContainer();
+        fila.AddThemeConstantOverride("separation", 4);
 
         var nombre = new Label
         {
@@ -106,10 +114,56 @@ public class RenderizadorEliminacion : IRenderizadorFase
             SizeFlagsHorizontal = Control.SizeFlags.ExpandFill
         };
         if (esGanador) nombre.AddThemeColorOverride("font_color", UiTorneoHelper.ColorEncabezado);
-
         fila.AddChild(nombre);
-        fila.AddChild(new Label { Text = goles, HorizontalAlignment = HorizontalAlignment.Right });
+
+        if (llave.IdaYVuelta)
+        {
+            fila.AddChild(CrearCeldaMarcador(ObtenerGolesIda(llave, esLocal), llave.JugadoIda));
+            fila.AddChild(CrearCeldaMarcador(ObtenerGolesVuelta(llave, esLocal), llave.JugadoVuelta));
+            fila.AddChild(new VSeparator());
+            fila.AddChild(CrearCeldaMarcador(ObtenerGolesGlobal(llave, esLocal), llave.Jugado, esGlobal: true));
+        }
+        else
+        {
+            fila.AddChild(CrearCeldaMarcador(ObtenerGolesGlobal(llave, esLocal), llave.Jugado));
+        }
+
         return fila;
+    }
+
+    // En la vuelta los roles de cancha se invierten: el que era local en la ida
+    // ahora juega de visitante, así que sus goles quedan guardados en GolesVisitanteVuelta.
+    private int ObtenerGolesIda(LlaveEliminacion l, bool esLocal) => esLocal ? l.GolesLocalIda : l.GolesVisitanteIda;
+    private int ObtenerGolesVuelta(LlaveEliminacion l, bool esLocal) => esLocal ? l.GolesVisitanteVuelta : l.GolesLocalVuelta;
+    private int ObtenerGolesGlobal(LlaveEliminacion l, bool esLocal) => esLocal ? l.GolesGlobalLocal : l.GolesGlobalVisitante;
+
+    private Control CrearCeldaMarcador(int goles, bool jugado, bool esGlobal = false)
+    {
+        var contenedor = new PanelContainer { CustomMinimumSize = new Vector2(28, 0) };
+
+        var estilo = new StyleBoxFlat
+        {
+            BgColor = esGlobal ? new Color(0.87f, 0.73f, 0f, 0.14f) : new Color(0.02f, 0.05f, 0.03f, 0.6f),
+            ContentMarginLeft = 3,
+            ContentMarginRight = 3,
+            ContentMarginTop = 2,
+            ContentMarginBottom = 2,
+            CornerRadiusTopLeft = 4,
+            CornerRadiusTopRight = 4,
+            CornerRadiusBottomLeft = 4,
+            CornerRadiusBottomRight = 4
+        };
+        contenedor.AddThemeStyleboxOverride("panel", estilo);
+
+        var label = new Label
+        {
+            Text = jugado ? goles.ToString() : "-",
+            HorizontalAlignment = HorizontalAlignment.Center
+        };
+        if (esGlobal) label.AddThemeColorOverride("font_color", UiTorneoHelper.ColorEncabezado);
+
+        contenedor.AddChild(label);
+        return contenedor;
     }
 
     public void DibujarFixture(Control contenedorFixture, FaseTorneo fase, string nombreEquipoJugador)

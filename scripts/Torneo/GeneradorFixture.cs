@@ -1,5 +1,6 @@
 using Godot;
 using System.Collections.Generic;
+using System.Linq;
 
 public static class GeneradorFixture
 {
@@ -48,22 +49,59 @@ public static class GeneradorFixture
             indices[1] = ultimo;
         }
 
+        // Si es impar, arreglamos las localías para que sean equitativas.
+        if (esImpar)
+        {
+            BalancearLocalias(idaSolamente, nombresEquipos.Count);
+        }
+
         return idaSolamente;
+    }
+
+    private static void BalancearLocalias(List<PartidoFixture> partidos, int totalEquiposReales)
+    {
+        List<string> ordenEquipos = partidos
+            .SelectMany(p => new[] { p.EquipoLocal, p.EquipoVisitante })
+            .Distinct()
+            .ToList();
+
+        var indicePorEquipo = ordenEquipos
+            .Select((nombre, indice) => (nombre, indice))
+            .ToDictionary(x => x.nombre, x => x.indice);
+
+        foreach (PartidoFixture partido in partidos)
+        {
+            int indiceLocal = indicePorEquipo[partido.EquipoLocal];
+            int indiceVisitante = indicePorEquipo[partido.EquipoVisitante];
+
+            if (!EsLocalSegunCirculante(indiceLocal, indiceVisitante, totalEquiposReales))
+            {
+                (partido.EquipoLocal, partido.EquipoVisitante) = (partido.EquipoVisitante, partido.EquipoLocal);
+            }
+        }
+    }
+
+    private static bool EsLocalSegunCirculante(int indiceA, int indiceB, int totalEquipos)
+    {
+        int diferencia = ((indiceB - indiceA) % totalEquipos + totalEquipos) % totalEquipos;
+        return diferencia >= 1 && diferencia <= (totalEquipos - 1) / 2;
     }
 
     public static List<PartidoFixture> GenerarFixtureIdaYVuelta(List<string> nombresEquipos)
     {
         List<PartidoFixture> idaSolamente = GenerarRondasUnaVuelta(nombresEquipos);
 
+        // Calculamos dinámicamente cuántas jornadas tuvo la ida.
+        // Así sirve para 4 equipos (3 jornadas) o 10 equipos (9 jornadas).
+        int rondasIda = idaSolamente.Count > 0 ? idaSolamente.Max(p => p.Jornada) : 0;
+
         var vuelta = new List<PartidoFixture>();
         foreach (PartidoFixture partido in idaSolamente)
         {
-            int jornadaVuelta = partido.Jornada == 1 ? 18 : partido.Jornada + 8;
-
             vuelta.Add(new PartidoFixture
             {
-                Jornada = jornadaVuelta,
-                EquipoLocal = partido.EquipoVisitante,
+                Jornada = partido.Jornada + rondasIda,
+                EquipoLocal = partido.EquipoVisitante, // Invertimos la localía
                 EquipoVisitante = partido.EquipoLocal
             });
         }

@@ -111,7 +111,19 @@ public partial class Hud : CanvasLayer
 
         if (_tiempoRestante <= 0)
         {
-            bool hayEmpate = GameManager.Instance.GolesEquipo1 == GameManager.Instance.GolesEquipo2;
+            bool hayEmpate;
+
+            if (PuenteTorneo.Instance.EsPartidoDeVuelta)
+            {
+                int globalJugador = GameManager.Instance.GolesEquipo2 + PuenteTorneo.Instance.GolesGlobalPrevios;
+                int globalRival = GameManager.Instance.GolesEquipo1 + PuenteTorneo.Instance.GolesGlobalPreviosRival;
+                hayEmpate = globalJugador == globalRival;
+            }
+            else
+            {
+                hayEmpate = GameManager.Instance.GolesEquipo1 == GameManager.Instance.GolesEquipo2;
+            }
+
             bool aplicaGolDeOro = PuenteTorneo.Instance.PartidoDeTorneo
                 && PuenteTorneo.Instance.EsFaseEliminacion
                 && hayEmpate;

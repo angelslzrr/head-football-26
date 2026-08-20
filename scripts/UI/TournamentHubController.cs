@@ -534,27 +534,31 @@ public partial class TournamentHubController : Control
         if (_estado.MundoSimulado) return;
         if (!EstaTorneoFinalizado()) return;
 
-        // Alcance MVP: solo Conmebol <-> OFC
-        string regionRestante = _estado.Region == "Sudamérica" ? "Oceania" : "Sudamérica";
+        // 🔑 El cambio clave: tomamos TODAS las regiones y le restamos la del jugador.
+        List<string> regionesASimular = RepositorioFormatos.TodasLasRegiones
+            .Except(new[] { _estado.Region })
+            .ToList();
 
-        List<FaseTorneo> fasesRestoDelMundo = RepositorioFormatos.ObtenerFormatoPorRegion(regionRestante);
-        List<TeamData> equiposRestoDelMundo = RepositorioEquipos.ObtenerEquiposPorRegion(regionRestante);
-        List<string> nombresRestoDelMundo = equiposRestoDelMundo.Select(e => e.TeamName).ToList();
-
-        // Estado descartable para reutilizar el motor
-        var estadoTemporal = new TournamentState();
-        GestorTorneo.IniciarTorneo(estadoTemporal, fasesRestoDelMundo, nombresRestoDelMundo);
-        GestorTorneo.SimularTorneoCompleto(estadoTemporal, equiposRestoDelMundo);
-
-        _estado.RestoDelMundo.Add(new EliminatoriaRegion
+        foreach (string regionRestante in regionesASimular)
         {
-            Region = regionRestante,
-            Fases = estadoTemporal.Fases
-        });
+            List<FaseTorneo> fasesRestoDelMundo = RepositorioFormatos.ObtenerFormatoPorRegion(regionRestante);
+            List<TeamData> equiposRestoDelMundo = RepositorioEquipos.ObtenerEquiposPorRegion(regionRestante);
+            List<string> nombresRestoDelMundo = equiposRestoDelMundo.Select(e => e.TeamName).ToList();
+
+            var estadoTemporal = new TournamentState();
+            GestorTorneo.IniciarTorneo(estadoTemporal, fasesRestoDelMundo, nombresRestoDelMundo);
+            GestorTorneo.SimularTorneoCompleto(estadoTemporal, equiposRestoDelMundo);
+
+            _estado.RestoDelMundo.Add(new EliminatoriaRegion
+            {
+                Region = regionRestante,
+                Fases = estadoTemporal.Fases
+            });
+
+            GD.Print($"🌍 Macro-simulación completada para: {regionRestante}");
+        }
 
         _estado.MundoSimulado = true;
         GestorGuardado.Instance.GuardarTorneo(_estado);
-        
-        GD.Print($"🌍 ¡Macro-simulación completada! Se simuló toda la región de: {regionRestante}");
     }
 }

@@ -149,6 +149,7 @@ public partial class SelectionMenuController : Control
         {
             "Sudamérica" => "res://img/mapas/mapaConmebol.png",
             "Oceania" => "res://img/mapas/mapaOfc.png",
+            "Norte y Centroamérica" => "res://img/mapas/mapaConcacaf.png",
             _ => null
         };
 

@@ -2,6 +2,14 @@ using System.Collections.Generic;
 
 public static class RepositorioFormatos
 {
+    // 📌 Única fuente de verdad de las regiones implementadas.
+    public static readonly List<string> TodasLasRegiones = new()
+    {
+        "Sudamérica",
+        "Oceania",
+        "Norte y Centroamérica"
+    };
+    
     public static List<FaseTorneo> ObtenerFormatoCONMEBOL()
     {
         return new List<FaseTorneo>

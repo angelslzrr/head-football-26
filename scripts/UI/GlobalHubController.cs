@@ -8,6 +8,7 @@ public partial class GlobalHubController : Control
 
     private VBoxContainer _panelIzquierdo;
     private OptionButton _dropdownFases;
+    private TabContainer _pestanas;
     private VBoxContainer _contenedorPosiciones;
     private VBoxContainer _listaFixture;
     private Button _btnVolver;
@@ -20,6 +21,7 @@ public partial class GlobalHubController : Control
     {
         _panelIzquierdo = GetNode<VBoxContainer>("Layout/ContenidoPrincipal/PanelIzquierdo");
         _dropdownFases = GetNode<OptionButton>("Layout/ContenidoPrincipal/PanelDerecho/DropdownFases");
+        _pestanas = GetNode<TabContainer>("Layout/ContenidoPrincipal/PanelDerecho/Pestanas");
         _contenedorPosiciones = GetNode<VBoxContainer>("Layout/ContenidoPrincipal/PanelDerecho/Pestanas/Posiciones/FondoTabla/ScrollPosiciones/ContenedorDinamicoPosiciones");
         _listaFixture = GetNode<VBoxContainer>("Layout/ContenidoPrincipal/PanelDerecho/Pestanas/Fixture/FondoFixture/ScrollFixture/ListaFixture");
         _btnVolver = GetNode<Button>("Layout/BarraInferior/BtnVolver");
@@ -86,6 +88,18 @@ public partial class GlobalHubController : Control
         if (_indiceFaseVisualizada < 0 || _indiceFaseVisualizada >= _regionVisualizada.Fases.Count) return;
 
         FaseTorneo fase = _regionVisualizada.Fases[_indiceFaseVisualizada];
+
+        // --- LÓGICA NUEVA DE PESTAÑAS ---
+        if (fase.Tipo == TipoFormato.Eliminacion)
+        {
+            _pestanas.TabsVisible = false; // Oculta los botones de Posiciones/Fixture
+            _pestanas.CurrentTab = 0;      // Fuerza a mostrar el arbolito
+        }
+        else
+        {
+            _pestanas.TabsVisible = true;  // Las vuelve a mostrar para Grupos/RoundRobin
+        }
+
         IRenderizadorFase renderizador = RenderizadorFactory.ObtenerRenderizador(fase.Tipo);
 
         renderizador.DibujarPosiciones(_contenedorPosiciones, fase, "");

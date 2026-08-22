@@ -10,6 +10,8 @@ public static class UiTorneoHelper
     public static readonly Color ColorBordeJugador = new Color(0.9f, 0.78f, 0.15f, 1f);
     public static readonly Color ColorEncabezado = new Color(0.9f, 0.78f, 0.15f, 1f);
     public static readonly Color ColorTransparente = new Color(0, 0, 0, 0);
+    public static readonly Color ColorFilaDirecta = new Color(0.13f, 0.45f, 0.2f, 0.4f);   // Verde
+    public static readonly Color ColorFilaRepechaje = new Color(0.15f, 0.4f, 0.6f, 0.4f);  // Azul
 
     public static void AgregarCelda(GridContainer grid, string texto, Color colorFondo, int anchoMinimo,
         bool esEncabezado = false, bool bordeIzquierdo = false,
@@ -33,7 +35,10 @@ public static class UiTorneoHelper
         if (bordeIzquierdo)
         {
             estilo.BorderColor = ColorBordeJugador;
-            estilo.BorderWidthLeft = 3;
+            estilo.BorderWidthLeft = 2;
+            estilo.BorderWidthRight = 2;
+            estilo.BorderWidthTop = 2;
+            estilo.BorderWidthBottom = 2;
         }
 
         var panel = new PanelContainer();
@@ -53,7 +58,8 @@ public static class UiTorneoHelper
         grid.AddChild(panel);
     }
 
-    public static void DibujarTabla(GridContainer grid, List<EstadisticasEquipoGuardado> tabla, string nombreEquipoJugador)
+    public static void DibujarTabla(GridContainer grid, List<EstadisticasEquipoGuardado> tabla, string nombreEquipoJugador,
+        HashSet<string> zonaDirecta = null, HashSet<string> zonaRepechaje = null)
     {
         foreach (Node hijo in grid.GetChildren()) hijo.QueueFree();
 
@@ -75,12 +81,20 @@ public static class UiTorneoHelper
         {
             EstadisticasEquipoGuardado equipo = ordenados[i];
             bool esJugador = equipo.NombreEquipo == nombreEquipoJugador;
-            Color colorFila = esJugador ? ColorFilaJugador : (i % 2 == 0 ? ColorFilaPar : ColorFilaImpar);
+
+            // Lógica de colores: prioriza la zona de clasificación, pero conserva el borde dorado si eres tú.
+            Color colorFila;
+            if (zonaDirecta != null && zonaDirecta.Contains(equipo.NombreEquipo))
+                colorFila = ColorFilaDirecta;
+            else if (zonaRepechaje != null && zonaRepechaje.Contains(equipo.NombreEquipo))
+                colorFila = ColorFilaRepechaje;
+            else
+                colorFila = esJugador ? ColorFilaJugador : (i % 2 == 0 ? ColorFilaPar : ColorFilaImpar);
 
             int inicioFila = grid.GetChildCount();
 
-            AgregarCelda(grid, (i + 1).ToString(), colorFila, anchos[0], bordeIzquierdo: esJugador);
-            AgregarCelda(grid, equipo.NombreEquipo, colorFila, anchos[1], alineacion: HorizontalAlignment.Center);
+            AgregarCelda(grid, (i + 1).ToString(), colorFila, anchos[0]);            
+            AgregarCelda(grid, equipo.NombreEquipo, colorFila, anchos[1], bordeIzquierdo: esJugador, alineacion: HorizontalAlignment.Center);
             AgregarCelda(grid, equipo.Jugados.ToString(), colorFila, anchos[2]);
             AgregarCelda(grid, equipo.Ganados.ToString(), colorFila, anchos[3]);
             AgregarCelda(grid, equipo.Empatados.ToString(), colorFila, anchos[4]);

@@ -15,7 +15,8 @@ public class RenderizadorRoundRobin : IRenderizadorFase
         grid.AddThemeConstantOverride("v_separation", 2);
         contenedorPosiciones.AddChild(grid);
 
-        UiTorneoHelper.DibujarTabla(grid, fase.TablaPosiciones, nombreEquipoJugador);
+        var (directos, repechaje) = ZonasClasificacionHelper.ObtenerZonas(fase);
+        UiTorneoHelper.DibujarTabla(grid, fase.TablaPosiciones, nombreEquipoJugador, directos, repechaje);
     }
 
     public void DibujarFixture(Control contenedorFixture, FaseTorneo fase, string nombreEquipoJugador)

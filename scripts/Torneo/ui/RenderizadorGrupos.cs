@@ -14,6 +14,9 @@ public class RenderizadorGrupos : IRenderizadorFase
         flow.AddThemeConstantOverride("v_separation", 20);
         contenedorPosiciones.AddChild(flow);
 
+        // Obtenemos quién va de verde y quién de azul para toda la fase
+        var (directos, repechaje) = ZonasClasificacionHelper.ObtenerZonas(fase);
+
         foreach (GrupoTorneo grupo in fase.Grupos)
         {
             var columna = new VBoxContainer { CustomMinimumSize = new Vector2(420, 0) };
@@ -28,7 +31,8 @@ public class RenderizadorGrupos : IRenderizadorFase
 
             flow.AddChild(columna);
 
-            UiTorneoHelper.DibujarTabla(grid, grupo.TablaPosiciones, nombreEquipoJugador);
+            // Le pasamos las zonas al dibujante
+            UiTorneoHelper.DibujarTabla(grid, grupo.TablaPosiciones, nombreEquipoJugador, directos, repechaje);
         }
     }
 

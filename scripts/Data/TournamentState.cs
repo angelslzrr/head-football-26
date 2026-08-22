@@ -20,6 +20,8 @@ public class TournamentState
 
     public List<EliminatoriaRegion> RestoDelMundo { get; set; } = new();
     public bool MundoSimulado { get; set; } = false;
+    public List<string> ClasificadosDirectoAlMundial { get; set; } = new();
+    public bool JugadorClasificoDirecto { get; set; } = false;
 
     // Propiedad de conveniencia que no se serializa en el JSON
     public FaseTorneo FaseActual =>

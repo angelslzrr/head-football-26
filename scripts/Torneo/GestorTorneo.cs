@@ -101,17 +101,56 @@ public static class GestorTorneo
 
         faseActual.Completada = true;
 
-        List<string> clasificados = generadorActual.ObtenerClasificados(faseActual);
+        List<string> clasificados;
 
-        if (faseActual.ClasificanASiguienteFase >= 0 && faseActual.ClasificanASiguienteFase < clasificados.Count)
+        // 👇 LA MAGIA PARA ÁFRICA (Y bifurcaciones futuras)
+        if (faseActual.DivideClasificados && faseActual.Tipo == TipoFormato.Grupos)
         {
-            clasificados = clasificados.Take(faseActual.ClasificanASiguienteFase).ToList();
+            var generadorGrupos = (GeneradorGrupos)generadorActual;
+            (List<string> directos, List<string> mejoresSegundos) =
+                generadorGrupos.ObtenerClasificadosConRepechaje(faseActual, faseActual.CantidadClasificadosExtra);
+
+            estado.ClasificadosDirectoAlMundial.AddRange(directos);
+            
+            // Aquí aplicamos tu regla: ordenamos a los 4 mejores segundos por Ranking FIFA
+            clasificados = mejoresSegundos
+                .OrderBy(equipo => RankingFifaProvider.ObtenerPosicion(equipo))
+                .ToList();
+
+            GD.Print($"🌍 {directos.Count} equipos clasificaron DIRECTO al Mundial: {string.Join(", ", directos)}");
+        }
+        else
+        {
+            clasificados = generadorActual.ObtenerClasificados(faseActual);
+
+            if (faseActual.ClasificanASiguienteFase >= 0 && faseActual.ClasificanASiguienteFase < clasificados.Count)
+            {
+                clasificados = clasificados.Take(faseActual.ClasificanASiguienteFase).ToList();
+            }
         }
 
         int siguienteIndice = estado.FaseActualIndice + 1;
 
         if (siguienteIndice >= estado.Fases.Count)
         {
+            // ¡Magia para que TODAS las confederaciones tengan su estrellita!
+            if (!faseActual.DivideClasificados)
+            {
+                if (faseActual.Tipo == TipoFormato.RoundRobin || faseActual.Tipo == TipoFormato.Grupos)
+                {
+                    var (directos, _) = ZonasClasificacionHelper.ObtenerZonas(faseActual);
+                    estado.ClasificadosDirectoAlMundial.AddRange(directos);
+                }
+                else if (faseActual.Tipo == TipoFormato.Eliminacion)
+                {
+                    // Si el torneo termina en Eliminación (como OFC) y el ganador va directo
+                    if (!faseActual.GanadorEsRepechaje && clasificados.Count > 0)
+                    {
+                        estado.ClasificadosDirectoAlMundial.Add(clasificados[0]);
+                    }
+                }
+            }
+
             if (faseActual.Tipo == TipoFormato.Eliminacion && clasificados.Count > 0)
             {
                 GD.Print($"🏆 Torneo finalizado. Campeón: {clasificados[0]}");
@@ -128,7 +167,12 @@ public static class GestorTorneo
 
         if (faseActual.Tipo == TipoFormato.Grupos && faseSiguiente.Tipo == TipoFormato.Eliminacion)
         {
-            clasificados = ReordenarCruceCruzado(clasificados);
+            // Como le quitaste el SorteoAleatorio a la Fase 2, ReordenarCruceCruzado 
+            // tomará tu lista ordenada y formará las llaves 1° vs 4° y 2° vs 3°.
+            if (!faseSiguiente.SorteoAleatorio)
+            {
+                clasificados = ReordenarCruceCruzado(clasificados);
+            }
         }
 
         List<string> entrada = new List<string>(clasificados);

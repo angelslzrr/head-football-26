@@ -49,8 +49,14 @@ public class RenderizadorEliminacion : IRenderizadorFase
             if (ronda > 1)
                 columna.AddChild(new Control { CustomMinimumSize = new Vector2(0, separacion / 2f) });
 
+            // NUEVO: Detectamos si esta es la ronda final de la fase
+            bool esRondaFinal = ronda == rondaMaxima;   
+
             foreach (LlaveEliminacion llave in llavesRonda)
-                columna.AddChild(CrearCajaLlave(llave, anchoUsado, nombreEquipoJugador));
+            {
+                // Le pasamos la 'fase' y 'esRondaFinal' a la función
+                columna.AddChild(CrearCajaLlave(llave, anchoUsado, nombreEquipoJugador, fase, esRondaFinal));
+            }
 
             filas.AddChild(columna);
         }
@@ -67,7 +73,7 @@ public class RenderizadorEliminacion : IRenderizadorFase
         };
     }
 
-    private Control CrearCajaLlave(LlaveEliminacion llave, int ancho, string nombreEquipoJugador)
+    private Control CrearCajaLlave(LlaveEliminacion llave, int ancho, string nombreEquipoJugador, FaseTorneo fase, bool esRondaFinal)
     {
         bool esPartidoJugador = llave.EquipoLocal == nombreEquipoJugador || llave.EquipoVisitante == nombreEquipoJugador;
 
@@ -93,17 +99,19 @@ public class RenderizadorEliminacion : IRenderizadorFase
         panel.AddThemeStyleboxOverride("panel", estilo);
 
         var caja = new VBoxContainer();
-        caja.AddChild(CrearFilaEquipo(llave, esLocal: true));
-        caja.AddChild(CrearFilaEquipo(llave, esLocal: false));
+        // Le añadimos nombreEquipoJugador al final de los parámetros
+        caja.AddChild(CrearFilaEquipo(llave, esLocal: true, fase, esRondaFinal, nombreEquipoJugador));    
+        caja.AddChild(CrearFilaEquipo(llave, esLocal: false, fase, esRondaFinal, nombreEquipoJugador));   
 
         panel.AddChild(caja);
         return panel;
     }
 
-    private Control CrearFilaEquipo(LlaveEliminacion llave, bool esLocal)
+    private Control CrearFilaEquipo(LlaveEliminacion llave, bool esLocal, FaseTorneo fase, bool esRondaFinal, string nombreEquipoJugador)
     {
         string nombreEquipo = esLocal ? llave.EquipoLocal : llave.EquipoVisitante;
         bool esGanador = !string.IsNullOrEmpty(llave.Ganador) && llave.Ganador == nombreEquipo;
+        bool esEquipoDelJugador = nombreEquipo == nombreEquipoJugador;
 
         var fila = new HBoxContainer();
         fila.AddThemeConstantOverride("separation", 4);
@@ -113,7 +121,13 @@ public class RenderizadorEliminacion : IRenderizadorFase
             Text = string.IsNullOrEmpty(nombreEquipo) ? "Por definir" : nombreEquipo,
             SizeFlagsHorizontal = Control.SizeFlags.ExpandFill
         };
-        if (esGanador) nombre.AddThemeColorOverride("font_color", UiTorneoHelper.ColorEncabezado);
+        
+        // El texto SOLO es dorado si es el equipo del jugador. Si no, es blanco.
+        if (esEquipoDelJugador) 
+            nombre.AddThemeColorOverride("font_color", UiTorneoHelper.ColorEncabezado);
+        else 
+            nombre.AddThemeColorOverride("font_color", new Color(1, 1, 1));
+            
         fila.AddChild(nombre);
 
         if (llave.IdaYVuelta)
@@ -128,7 +142,43 @@ public class RenderizadorEliminacion : IRenderizadorFase
             fila.AddChild(CrearCeldaMarcador(ObtenerGolesGlobal(llave, esLocal), llave.Jugado));
         }
 
-        return fila;
+        // ALINEACIÓN PERFECTA y COLORES DE ZONA
+        Color colorZona = UiTorneoHelper.ColorTransparente;
+        
+        if (llave.Jugado) // Solo pintamos si el partido ya terminó
+        {
+            if (esGanador)
+            {
+                bool vaARepechaje = esRondaFinal && fase.GanadorEsRepechaje;
+                colorZona = vaARepechaje ? UiTorneoHelper.ColorFilaRepechaje : UiTorneoHelper.ColorFilaDirecta;
+            }
+            else
+            {
+                // NUEVO: Si perdió la final y esa fase manda al perdedor al repechaje (OFC)
+                if (esRondaFinal && fase.PerdedorEsRepechaje)
+                {
+                    colorZona = UiTorneoHelper.ColorFilaRepechaje;
+                }
+            }
+        }
+
+        var panelFila = new PanelContainer();
+        var estiloFila = new StyleBoxFlat
+        {
+            BgColor = colorZona,
+            ContentMarginLeft = 4,
+            ContentMarginRight = 4,
+            ContentMarginTop = 2,
+            ContentMarginBottom = 2,
+            CornerRadiusTopLeft = 4,
+            CornerRadiusTopRight = 4,
+            CornerRadiusBottomLeft = 4,
+            CornerRadiusBottomRight = 4
+        };
+        panelFila.AddThemeStyleboxOverride("panel", estiloFila);
+        panelFila.AddChild(fila);
+        
+        return panelFila;
     }
 
     // En la vuelta los roles de cancha se invierten: el que era local en la ida

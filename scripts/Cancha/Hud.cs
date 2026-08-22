@@ -24,6 +24,11 @@ public partial class Hud : CanvasLayer
         _labelTiempo = GetNode<Label>("FondoMarcador/LabelTiempo");
         _timerPartido = GetNode<Timer>("TimerPartido");
 
+        if (_labelTiempo.LabelSettings != null)
+        {
+            _labelTiempo.LabelSettings.FontSize = 29;
+        }
+
         TextureButton btnPausa = GetNode<TextureButton>("BtnPausa");
         btnPausa.Pressed += () => 
         {

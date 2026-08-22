@@ -17,6 +17,19 @@ public class FaseTorneo
     public bool RondaUnica { get; set; } = false;
     public bool IdaYVuelta { get; set; } = false;
     public bool LlavesIdaYVuelta { get; set; } = false;
+    public bool DivideClasificados { get; set; } = false;
+    public int CantidadClasificadosExtra { get; set; } = 0;
+
+    // Solo aplica a fases tipo RoundRobin (como CONMEBOL).
+    // Cuántos puestos de la tabla GENERAL son verdes (directo) y cuántos azules (repechaje).
+    public int ZonaDirectaCantidad { get; set; } = 0;
+    public int ZonaRepechajeCantidad { get; set; } = 0;
+
+    // Solo aplica a fases tipo Eliminacion (Ej: Ronda 2 de África).
+    // Si es true, el que gana la FINAL de esa llave se pinta de azul (Repechaje) en vez de verde.
+    public bool GanadorEsRepechaje { get; set; } = false;
+    // Si es true, el perdedor de la RONDA FINAL se pinta de azul (Repechaje).
+    public bool PerdedorEsRepechaje { get; set; } = false;
 
     // Equipos que entran DIRECTAMENTE a esta fase.
     public List<string> EquiposDirectos { get; set; } = new();

@@ -7,7 +7,8 @@ public static class RepositorioFormatos
     {
         "Sudamérica",
         "Oceania",
-        "Norte y Centroamérica"
+        "Norte y Centroamérica",
+        "África"
     };
     
     public static List<FaseTorneo> ObtenerFormatoCONMEBOL()
@@ -17,7 +18,9 @@ public static class RepositorioFormatos
             new FaseTorneo
             {
                 Nombre = "Eliminatoria Sudamericana",
-                Tipo = TipoFormato.RoundRobin
+                Tipo = TipoFormato.RoundRobin,
+                ZonaDirectaCantidad = 6,
+                ZonaRepechajeCantidad = 1
             }
         };
     }
@@ -45,7 +48,8 @@ public static class RepositorioFormatos
             {
                 Nombre = "Ronda 3 — Semifinales y Final",
                 Tipo = TipoFormato.Eliminacion,
-                SorteoAleatorio = false            
+                SorteoAleatorio = false,
+                PerdedorEsRepechaje = true // ¡El perdedor de la final se va a repechaje!
             }
         };
     }
@@ -76,8 +80,33 @@ public static class RepositorioFormatos
                 Nombre = "Ronda 3 — Fase Final",
                 Tipo = TipoFormato.Grupos,
                 EquiposPorGrupo = 4,
-                IdaYVuelta = true, // Aquí activamos la doble vuelta universal
-                ClasificanASiguienteFase = -1 
+                IdaYVuelta = true,
+                ClasificanPorGrupo = 1,          // Solo el 1° de cada grupo va de verde (Directo)
+                DivideClasificados = true,       // Activa la lógica de cruce de grupos
+                CantidadClasificadosExtra = 2    // Solo los 2 mejores segundos de los 3 grupos van de azul (Repechaje)
+            }
+        };
+    }
+
+    public static List<FaseTorneo> ObtenerFormatoCAF()
+    {
+        return new List<FaseTorneo>
+        {
+            new FaseTorneo
+            {
+                Nombre = "Ronda 1 — Fase de Grupos",
+                Tipo = TipoFormato.Grupos,
+                EquiposPorGrupo = 6,
+                IdaYVuelta = true,
+                DivideClasificados = true,
+                CantidadClasificadosExtra = 4
+            },
+            new FaseTorneo
+            {
+                Nombre = "Ronda 2 — Play-offs rumbo a Repesca",
+                Tipo = TipoFormato.Eliminacion,
+                SorteoAleatorio = false, // ¡Crucial para cruzar por Ranking!
+                GanadorEsRepechaje = true   // El campeón de esta mini-llave va de azul
             }
         };
     }
@@ -89,6 +118,7 @@ public static class RepositorioFormatos
             "Sudamérica" => ObtenerFormatoCONMEBOL(),
             "Oceania" => ObtenerFormatoOFC(),
             "Norte y Centroamérica" => ObtenerFormatoCONCACAF(),
+            "África" => ObtenerFormatoCAF(),
             _ => new List<FaseTorneo>()
         };
     }

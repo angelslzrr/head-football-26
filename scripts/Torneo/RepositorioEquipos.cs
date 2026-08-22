@@ -19,6 +19,7 @@ public static class RepositorioEquipos
             "Sudamérica" => ObtenerEquiposConmebol(),
             "Oceania" => ObtenerEquiposOFC(),
             "Norte y Centroamérica" => ObtenerEquiposConcacaf(),
+            "África" => ObtenerEquiposCAF(),
             _ => new List<TeamData>()
         };
     }
@@ -47,11 +48,11 @@ public static class RepositorioEquipos
         var definiciones = new List<DefinicionEquipo>
         {
             new() { Nombre = "Nueva Zelanda", FifaCode = "NZL", ArchivoCabeza = "cabezon_Wood_Nzl.png", ArchivoCamiseta = "camiseta_NuevaZelanda.png", ArchivoBandera = "bandera_NuevaZelanda.png" },
-            new() { Nombre = "Vanuatu", FifaCode = "VAN", ArchivoCabeza = "cabezon_Kaltak_Van.png", ArchivoCamiseta = "camiseta_Vanuatu.png", ArchivoBandera = "bandera_Vanuatu.png" },
             new() { Nombre = "Nueva Caledonia", FifaCode = "NCL", ArchivoCabeza = "cabezon_Fulgini_Ncl.png", ArchivoCamiseta = "camiseta_NuevaCaledonia.png", ArchivoBandera = "bandera_NuevaCaledonia.png" },
             new() { Nombre = "Islas Salomon", FifaCode = "SOL", ArchivoCabeza = "cabezon_Lea'i_Sol.png", ArchivoCamiseta = "camiseta_IslasSalomon.png", ArchivoBandera = "bandera_IslasSalomon.png" },
             new() { Nombre = "Fiyi", FifaCode = "FIJ", ArchivoCabeza = "cabezon_Krishna_Fij.png", ArchivoCamiseta = "camiseta_Fiyi.png", ArchivoBandera = "bandera_Fiyi.png" },
             new() { Nombre = "Tahiti", FifaCode = "TAH", ArchivoCabeza = "cabezon_Tehau_Tah.png", ArchivoCamiseta = "camiseta_Tahiti.png", ArchivoBandera = "bandera_Tahiti.png" },
+            new() { Nombre = "Vanuatu", FifaCode = "VAN", ArchivoCabeza = "cabezon_Kaltak_Van.png", ArchivoCamiseta = "camiseta_Vanuatu.png", ArchivoBandera = "bandera_Vanuatu.png" },
             new() { Nombre = "Papua Nueva Guinea", FifaCode = "PNG", ArchivoCabeza = "cabezon_Gunemba_Png.png", ArchivoCamiseta = "camiseta_PapuaNuevaGuinea.png", ArchivoBandera = "bandera_PapuaNuevaGuinea.png" },
             new() { Nombre = "Islas Cook", FifaCode = "COK", ArchivoCabeza = "cabezon_Saghabi_Cok.png", ArchivoCamiseta = "camiseta_IslasCook.png", ArchivoBandera = "bandera_IslasCook.png" },
             new() { Nombre = "Samoa", FifaCode = "SAM", ArchivoCabeza = "cabezon_Setefano_Sam.png", ArchivoCamiseta = "camiseta_Samoa.png", ArchivoBandera = "bandera_Samoa.png" },
@@ -101,6 +102,69 @@ public static class RepositorioEquipos
         };
 
         return ConstruirEquipos("Norte y Centroamérica", "concacaf", definiciones);
+    }
+
+    public static List<TeamData> ObtenerEquiposCAF()
+    {
+        var definiciones = new List<DefinicionEquipo>
+        {
+            new() { Nombre = "Marruecos", FifaCode = "MAR", ArchivoCabeza = "cabezon_generico.png", ArchivoCamiseta = "camiseta_Marruecos.png", ArchivoBandera = "bandera_Marruecos.png" },
+            new() { Nombre = "Senegal", FifaCode = "SEN", ArchivoCabeza = "cabezon_generico.png", ArchivoCamiseta = "camiseta_Senegal.png", ArchivoBandera = "bandera_Senegal.png" },
+            new() { Nombre = "Nigeria", FifaCode = "NGA", ArchivoCabeza = "cabezon_generico.png", ArchivoCamiseta = "camiseta_Nigeria.png", ArchivoBandera = "bandera_Nigeria.png" },
+            new() { Nombre = "Argelia", FifaCode = "ALG", ArchivoCabeza = "cabezon_generico.png", ArchivoCamiseta = "camiseta_Argelia.png", ArchivoBandera = "bandera_Argelia.png" },
+            new() { Nombre = "Egipto", FifaCode = "EGY", ArchivoCabeza = "cabezon_generico.png", ArchivoCamiseta = "camiseta_Egipto.png", ArchivoBandera = "bandera_Egipto.png" },
+            new() { Nombre = "Costa de Marfil", FifaCode = "CIV", ArchivoCabeza = "cabezon_generico.png", ArchivoCamiseta = "camiseta_CostaDeMarfil.png", ArchivoBandera = "bandera_CostaDeMarfil.png" },
+            new() { Nombre = "Camerún", FifaCode = "CMR", ArchivoCabeza = "cabezon_generico.png", ArchivoCamiseta = "camiseta_Camerun.png", ArchivoBandera = "bandera_Camerun.png" },
+            new() { Nombre = "Túnez", FifaCode = "TUN", ArchivoCabeza = "cabezon_generico.png", ArchivoCamiseta = "camiseta_Tunez.png", ArchivoBandera = "bandera_Tunez.png" },
+            new() { Nombre = "RD Congo", FifaCode = "COD", ArchivoCabeza = "cabezon_generico.png", ArchivoCamiseta = "camiseta_RdCongo.png", ArchivoBandera = "bandera_RdCongo.png" },
+            new() { Nombre = "Malí", FifaCode = "MLI", ArchivoCabeza = "cabezon_generico.png", ArchivoCamiseta = "camiseta_Mali.png", ArchivoBandera = "bandera_Mali.png" },
+            new() { Nombre = "Sudáfrica", FifaCode = "RSA", ArchivoCabeza = "cabezon_generico.png", ArchivoCamiseta = "camiseta_Sudafrica.png", ArchivoBandera = "bandera_Sudafrica.png" },
+            new() { Nombre = "Burkina Faso", FifaCode = "BFA", ArchivoCabeza = "cabezon_generico.png", ArchivoCamiseta = "camiseta_BurkinaFaso.png", ArchivoBandera = "bandera_BurkinaFaso.png" },
+            new() { Nombre = "Cabo Verde", FifaCode = "CPV", ArchivoCabeza = "cabezon_generico.png", ArchivoCamiseta = "camiseta_CaboVerde.png", ArchivoBandera = "bandera_CaboVerde.png" },
+            new() { Nombre = "Ghana", FifaCode = "GHA", ArchivoCabeza = "cabezon_generico.png", ArchivoCamiseta = "camiseta_Ghana.png", ArchivoBandera = "bandera_Ghana.png" },
+            new() { Nombre = "Guinea", FifaCode = "GUI", ArchivoCabeza = "cabezon_generico.png", ArchivoCamiseta = "camiseta_Guinea.png", ArchivoBandera = "bandera_Guinea.png" },
+            new() { Nombre = "Gabón", FifaCode = "GAB", ArchivoCabeza = "cabezon_generico.png", ArchivoCamiseta = "camiseta_Gabon.png", ArchivoBandera = "bandera_Gabon.png" },
+            new() { Nombre = "Angola", FifaCode = "ANG", ArchivoCabeza = "cabezon_generico.png", ArchivoCamiseta = "camiseta_Angola.png", ArchivoBandera = "bandera_Angola.png" },
+            new() { Nombre = "Uganda", FifaCode = "UGA", ArchivoCabeza = "cabezon_generico.png", ArchivoCamiseta = "camiseta_Uganda.png", ArchivoBandera = "bandera_Uganda.png" },
+            new() { Nombre = "Zambia", FifaCode = "ZAM", ArchivoCabeza = "cabezon_generico.png", ArchivoCamiseta = "camiseta_Zambia.png", ArchivoBandera = "bandera_Zambia.png" },
+            new() { Nombre = "Benín", FifaCode = "BEN", ArchivoCabeza = "cabezon_generico.png", ArchivoCamiseta = "camiseta_Benin.png", ArchivoBandera = "bandera_Benin.png" },
+            new() { Nombre = "Mozambique", FifaCode = "MOZ", ArchivoCabeza = "cabezon_generico.png", ArchivoCamiseta = "camiseta_Mozambique.png", ArchivoBandera = "bandera_Mozambique.png" },
+            new() { Nombre = "Madagascar", FifaCode = "MAD", ArchivoCabeza = "cabezon_generico.png", ArchivoCamiseta = "camiseta_Madagascar.png", ArchivoBandera = "bandera_Madagascar.png" },
+            new() { Nombre = "Guinea Ecuatorial", FifaCode = "EQG", ArchivoCabeza = "cabezon_generico.png", ArchivoCamiseta = "camiseta_GuineaEcuatorial.png", ArchivoBandera = "bandera_GuineaEcuatorial.png" },
+            new() { Nombre = "Comoras", FifaCode = "COM", ArchivoCabeza = "cabezon_generico.png", ArchivoCamiseta = "camiseta_Comoras.png", ArchivoBandera = "bandera_Comoras.png" },
+            new() { Nombre = "Kenia", FifaCode = "KEN", ArchivoCabeza = "cabezon_generico.png", ArchivoCamiseta = "camiseta_Kenia.png", ArchivoBandera = "bandera_Kenia.png" },
+            new() { Nombre = "Libia", FifaCode = "LBY", ArchivoCabeza = "cabezon_generico.png", ArchivoCamiseta = "camiseta_Libia.png", ArchivoBandera = "bandera_Libia.png" },
+            new() { Nombre = "Tanzania", FifaCode = "TAN", ArchivoCabeza = "cabezon_generico.png", ArchivoCamiseta = "camiseta_Tanzania.png", ArchivoBandera = "bandera_Tanzania.png" },
+            new() { Nombre = "Mauritania", FifaCode = "MTN", ArchivoCabeza = "cabezon_generico.png", ArchivoCamiseta = "camiseta_Mauritania.png", ArchivoBandera = "bandera_Mauritania.png" },
+            new() { Nombre = "Níger", FifaCode = "NIG", ArchivoCabeza = "cabezon_generico.png", ArchivoCamiseta = "camiseta_Niger.png", ArchivoBandera = "bandera_Niger.png" },
+            new() { Nombre = "Gambia", FifaCode = "GAM", ArchivoCabeza = "cabezon_generico.png", ArchivoCamiseta = "camiseta_Gambia.png", ArchivoBandera = "bandera_Gambia.png" },
+            new() { Nombre = "Sudán", FifaCode = "SDN", ArchivoCabeza = "cabezon_generico.png", ArchivoCamiseta = "camiseta_Sudan.png", ArchivoBandera = "bandera_Sudan.png" },
+            new() { Nombre = "Togo", FifaCode = "TOG", ArchivoCabeza = "cabezon_generico.png", ArchivoCamiseta = "camiseta_Togo.png", ArchivoBandera = "bandera_Togo.png" },
+            new() { Nombre = "Namibia", FifaCode = "NAM", ArchivoCabeza = "cabezon_generico.png", ArchivoCamiseta = "camiseta_Namibia.png", ArchivoBandera = "bandera_Namibia.png" },
+            new() { Nombre = "Sierra Leona", FifaCode = "SLE", ArchivoCabeza = "cabezon_generico.png", ArchivoCamiseta = "camiseta_SierraLeona.png", ArchivoBandera = "bandera_SierraLeona.png" },
+            new() { Nombre = "Ruanda", FifaCode = "RWA", ArchivoCabeza = "cabezon_generico.png", ArchivoCamiseta = "camiseta_Ruanda.png", ArchivoBandera = "bandera_Ruanda.png" },
+            new() { Nombre = "Malaui", FifaCode = "MWI", ArchivoCabeza = "cabezon_generico.png", ArchivoCamiseta = "camiseta_Malaui.png", ArchivoBandera = "bandera_Malaui.png" },
+            new() { Nombre = "Zimbabue", FifaCode = "ZIM", ArchivoCabeza = "cabezon_generico.png", ArchivoCamiseta = "camiseta_Zimbabue.png", ArchivoBandera = "bandera_Zimbabue.png" },
+            new() { Nombre = "Guinea-Bisáu", FifaCode = "GNB", ArchivoCabeza = "cabezon_generico.png", ArchivoCamiseta = "camiseta_GuineaBisau.png", ArchivoBandera = "bandera_GuineaBisau.png" },
+            new() { Nombre = "Congo", FifaCode = "CGO", ArchivoCabeza = "cabezon_generico.png", ArchivoCamiseta = "camiseta_Congo.png", ArchivoBandera = "bandera_Congo.png" },
+            new() { Nombre = "República Centroafricana", FifaCode = "CTA", ArchivoCabeza = "cabezon_generico.png", ArchivoCamiseta = "camiseta_RepublicaCentroafricana.png", ArchivoBandera = "bandera_RepublicaCentroafricana.png" },
+            new() { Nombre = "Liberia", FifaCode = "LBR", ArchivoCabeza = "cabezon_generico.png", ArchivoCamiseta = "camiseta_Liberia.png", ArchivoBandera = "bandera_Liberia.png" },
+            new() { Nombre = "Burundi", FifaCode = "BDI", ArchivoCabeza = "cabezon_generico.png", ArchivoCamiseta = "camiseta_Burundi.png", ArchivoBandera = "bandera_Burundi.png" },
+            new() { Nombre = "Etiopía", FifaCode = "ETH", ArchivoCabeza = "cabezon_generico.png", ArchivoCamiseta = "camiseta_Etiopia.png", ArchivoBandera = "bandera_Etiopia.png" },
+            new() { Nombre = "Lesoto", FifaCode = "LES", ArchivoCabeza = "cabezon_generico.png", ArchivoCamiseta = "camiseta_Lesoto.png", ArchivoBandera = "bandera_Lesoto.png" },
+            new() { Nombre = "Botsuana", FifaCode = "BOT", ArchivoCabeza = "cabezon_generico.png", ArchivoCamiseta = "camiseta_Botsuana.png", ArchivoBandera = "bandera_Botsuana.png" },
+            new() { Nombre = "Suazilandia", FifaCode = "SWZ", ArchivoCabeza = "cabezon_generico.png", ArchivoCamiseta = "camiseta_Suazilandia.png", ArchivoBandera = "bandera_Suazilandia.png" },
+            new() { Nombre = "Sudán del Sur", FifaCode = "SSD", ArchivoCabeza = "cabezon_generico.png", ArchivoCamiseta = "camiseta_SudanDelSur.png", ArchivoBandera = "bandera_SudanDelSur.png" },
+            new() { Nombre = "Mauricio", FifaCode = "MRI", ArchivoCabeza = "cabezon_generico.png", ArchivoCamiseta = "camiseta_Mauricio.png", ArchivoBandera = "bandera_Mauricio.png" },
+            new() { Nombre = "Chad", FifaCode = "CHA", ArchivoCabeza = "cabezon_generico.png", ArchivoCamiseta = "camiseta_Chad.png", ArchivoBandera = "bandera_Chad.png" },
+            new() { Nombre = "Eritrea", FifaCode = "ERI", ArchivoCabeza = "cabezon_generico.png", ArchivoCamiseta = "camiseta_Eritrea.png", ArchivoBandera = "bandera_Eritrea.png" },
+            new() { Nombre = "Santo Tomé y Príncipe", FifaCode = "STP", ArchivoCabeza = "cabezon_generico.png", ArchivoCamiseta = "camiseta_SantoTomeYPrincipe.png", ArchivoBandera = "bandera_SantoTomeYPrincipe.png" },
+            new() { Nombre = "Yibuti", FifaCode = "DJI", ArchivoCabeza = "cabezon_generico.png", ArchivoCamiseta = "camiseta_Yibuti.png", ArchivoBandera = "bandera_Yibuti.png" },
+            new() { Nombre = "Somalia", FifaCode = "SOM", ArchivoCabeza = "cabezon_generico.png", ArchivoCamiseta = "camiseta_Somalia.png", ArchivoBandera = "bandera_Somalia.png" },
+            new() { Nombre = "Seychelles", FifaCode = "SEY", ArchivoCabeza = "cabezon_generico.png", ArchivoCamiseta = "camiseta_Seychelles.png", ArchivoBandera = "bandera_Seychelles.png" }
+        };
+
+        return ConstruirEquipos("África", "caf", definiciones);
     }
 
     private static List<TeamData> ConstruirEquipos(string region, string carpetaAssets, List<DefinicionEquipo> definiciones)
@@ -164,6 +228,7 @@ public static class RepositorioEquipos
         todosLosEquipos.AddRange(ObtenerEquiposConmebol());
         todosLosEquipos.AddRange(ObtenerEquiposOFC());
         todosLosEquipos.AddRange(ObtenerEquiposConcacaf());
+        todosLosEquipos.AddRange(ObtenerEquiposCAF());
 
         return todosLosEquipos.Find(e => e.TeamName == nombreEquipo);
     }

@@ -189,6 +189,15 @@ public partial class TournamentHubController : Control
             return;
         }
 
+        if (_estado.JugadorClasificoDirecto)
+        {
+            _btnSimularJornada.Disabled = false;
+            _btnSimularJornada.Text = "Simular resto del torneo";
+            _mensajePartidoJugador.Visible = true;
+            _mensajePartidoJugador.Text = "¡Clasificaste DIRECTO al Mundial como líder de grupo!\nSimula el resto para ver quién va a la repesca.";
+            return;
+        }
+        
         if (_estado.JugadorEliminado)
         {
             _btnSimularJornada.Disabled = false;
@@ -218,7 +227,7 @@ public partial class TournamentHubController : Control
 
     private void AvanzarSimulacion()
     {
-        if (_estado.JugadorEliminado)
+        if (_estado.JugadorEliminado || _estado.JugadorClasificoDirecto)
         {
             SimularRestoDelTorneo();
             return;
@@ -380,8 +389,11 @@ public partial class TournamentHubController : Control
     {
         if (faseDelPartido == null || faseDelPartido.Tipo != TipoFormato.Eliminacion) return;
 
-        LlaveEliminacion llaveDelJugador = faseDelPartido.Llaves.FirstOrDefault(l =>
-            l.EquipoLocal == _estado.NombreEquipoJugador || l.EquipoVisitante == _estado.NombreEquipoJugador);
+        // ARREGLO: Ordenamos por Ronda descendente para que SIEMPRE revise tu último partido jugado.
+        LlaveEliminacion llaveDelJugador = faseDelPartido.Llaves
+            .Where(l => l.EquipoLocal == _estado.NombreEquipoJugador || l.EquipoVisitante == _estado.NombreEquipoJugador)
+            .OrderByDescending(l => l.Ronda)
+            .FirstOrDefault();
 
         if (llaveDelJugador == null || !llaveDelJugador.Jugado) return; // Si falta la vuelta, sigue vivo
 
@@ -393,9 +405,16 @@ public partial class TournamentHubController : Control
 
     private void DetectarEliminacionPorClasificacion(FaseTorneo faseAntesDeAvanzar)
     {
-        if (_estado.JugadorEliminado) return;
+        if (_estado.JugadorEliminado || _estado.JugadorClasificoDirecto) return;
         if (faseAntesDeAvanzar == null || !faseAntesDeAvanzar.Completada) return;
-        if (faseAntesDeAvanzar.Tipo == TipoFormato.Eliminacion) return; 
+        if (faseAntesDeAvanzar.Tipo == TipoFormato.Eliminacion) return;
+
+        // 👇 Si quedaste entre los 9 líderes de grupo, ¡te vas directo al Mundial!
+        if (_estado.ClasificadosDirectoAlMundial.Contains(_estado.NombreEquipoJugador))
+        {
+            _estado.JugadorClasificoDirecto = true;
+            return;
+        }
 
         bool sigueVivo = _estado.FaseActual != null
             && EquipoEstaEnFase(_estado.NombreEquipoJugador, _estado.FaseActual);
@@ -552,7 +571,8 @@ public partial class TournamentHubController : Control
             _estado.RestoDelMundo.Add(new EliminatoriaRegion
             {
                 Region = regionRestante,
-                Fases = estadoTemporal.Fases
+                Fases = estadoTemporal.Fases,
+                ClasificadosDirectoAlMundial = estadoTemporal.ClasificadosDirectoAlMundial
             });
 
             GD.Print($"🌍 Macro-simulación completada para: {regionRestante}");
